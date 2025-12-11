@@ -146,7 +146,7 @@ fun DashboardBody() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-        ) 
+        )
     }
 }
 
