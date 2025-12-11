@@ -146,7 +146,16 @@ fun DashboardBody() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-        )
+        ){
+            when(selectedItem){
+                0 -> HomeScreen()
+                1 -> CreateScreen()
+                2 -> ProfileScreen()
+                3 -> NotificationScreen()
+                4 -> SettingScreen()
+                else -> HomeScreen()
+            }
+        }
     }
 }
 
