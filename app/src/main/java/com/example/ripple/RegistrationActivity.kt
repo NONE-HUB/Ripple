@@ -45,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -57,8 +58,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ai37b.viewmodel.UserViewModel
+import com.example.ripple.model.UserModel
+import com.example.ripple.repository.UserRepoImpl
 import com.example.ripple.ui.theme.RippleTheme
 import com.example.ripple.ui.theme.PurpleGrey80
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 class RegistrationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,6 +79,18 @@ class RegistrationActivity : ComponentActivity() {
 @Composable
 fun RegistartionBody(){
 
+    val userViewModel = remember { UserViewModel(UserRepoImpl()) }
+
+    var userId by remember { mutableStateOf("") }
+    var firstName by remember { mutableStateOf("") }
+    var middleName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    var gender by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var visibility by remember { mutableStateOf(false) }
+    var terms by remember { mutableStateOf(false) }
+
     var firstname by remember { mutableStateOf("") }
     var middlename by remember { mutableStateOf("") }
     var lastname by remember { mutableStateOf("") }
@@ -81,7 +99,7 @@ fun RegistartionBody(){
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
 
-    var terms by remember { mutableStateOf(false) }
+
 
     val activity = context as Activity
 
@@ -115,39 +133,39 @@ fun RegistartionBody(){
                 .padding(paddingValues = padding)
         ) {
 
-            Spacer(modifier = Modifier .height(60.dp))
+            Spacer(modifier = Modifier .height(10.dp))
 
-            Text("English(UK)",
-                style = TextStyle(
-                    textAlign = TextAlign.Center,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp,
-                    color = Color.Gray
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
+//            Text("English(UK)",
+//                style = TextStyle(
+//                    textAlign = TextAlign.Center,
+//                    fontWeight = FontWeight.Bold,
+//                    fontSize = 18.sp,
+//                    color = Color.Gray
+//                ),
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//
+//            )
 
-            )
+            Spacer(modifier = Modifier .height(10.dp))
 
-            Spacer(modifier = Modifier .height(60.dp))
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .size(105.dp)
+//                    .clip(CircleShape)
+//                    .padding(4.dp),
+//                verticalAlignment = Alignment.CenterVertically,
+//                horizontalArrangement = Arrangement.Center
+//            ) {
+//                Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+//                    modifier = Modifier
+//                        .size(95.dp)
+//                        .clip(shape = CircleShape),
+//                    contentScale = ContentScale.Crop)
+//            }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .size(105.dp)
-                    .clip(CircleShape)
-                    .padding(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
-                    modifier = Modifier
-                        .size(95.dp)
-                        .clip(shape = CircleShape),
-                    contentScale = ContentScale.Crop)
-            }
-
-            Spacer(modifier = Modifier .height(60.dp))
+            Spacer(modifier = Modifier .height(10.dp))
 
             Text("Enter your username",
                 style = TextStyle(
@@ -158,11 +176,35 @@ fun RegistartionBody(){
 
             Spacer(modifier = Modifier .height(10.dp))
 
-            Character(
-                value = username,
-                onValueChange = { username = it },
-                label = "Username",
+//            Character(
+//                value = username,
+//                onValueChange = { username = it },
+//                label = "Username",
+//                modifier = Modifier
+//            )
+
+            OutlinedTextField(
+                value = userId,
+                onValueChange = { data ->
+                    userId= data
+                },
                 modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp),
+                shape = RoundedCornerShape(15.dp),
+                placeholder = {
+                    Text("userId")
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email
+                ),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = PurpleGrey80,
+                    unfocusedContainerColor = PurpleGrey80,
+                    focusedIndicatorColor = Blue,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
+
             )
 
             Spacer(modifier = Modifier .height(20.dp))
@@ -199,30 +241,131 @@ fun RegistartionBody(){
             }
 
             Row() {
-                Character(
-                    value = firstname,
-                    onValueChange = { firstname = it },
-                    label = ".....",
-                    modifier = Modifier
-                        .weight(1f)
+//                Character(
+//                    value = firstname,
+//                    onValueChange = { firstname = it },
+//                    label = ".....",
+//                    modifier = Modifier
+//                        .weight(1f)
+//                )
+
+            OutlinedTextField(
+                value = firstName,
+                onValueChange = { data ->
+                    firstName = data
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp)
+                    .weight(1f),
+                shape = RoundedCornerShape(15.dp),
+                placeholder = {
+                    Text(".....")
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email
+                ),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = PurpleGrey80,
+                    unfocusedContainerColor = PurpleGrey80,
+                    focusedIndicatorColor = Blue,
+                    unfocusedIndicatorColor = Color.Transparent
                 )
 
-                Character(
-                    value = middlename,
-                    onValueChange = { middlename = it },
-                    label = ".....",
-                    modifier = Modifier
-                        .weight(1f)
+            )
+//
+//                Character(
+//                    value = middlename,
+//                    onValueChange = { middlename = it },
+//                    label = ".....",
+//                    modifier = Modifier
+//                        .weight(1f)
+//                )
+
+            OutlinedTextField(
+                value = middleName,
+                onValueChange = { data ->
+                    middleName = data
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp)
+                    .weight(1f),
+                shape = RoundedCornerShape(15.dp),
+                placeholder = {
+                    Text(".....")
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email
+                ),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = PurpleGrey80,
+                    unfocusedContainerColor = PurpleGrey80,
+                    focusedIndicatorColor = Blue,
+                    unfocusedIndicatorColor = Color.Transparent
                 )
 
-                Character(
-                    value = lastname,
-                    onValueChange = { lastname = it },
-                    label = ".....",
-                    modifier = Modifier
-                        .weight(1f)
+            )
+//
+//                Character(
+//                    value = lastname,
+//                    onValueChange = { lastname = it },
+//                    label = ".....",
+//                    modifier = Modifier
+//                        .weight(1f)
+//                )
+
+            OutlinedTextField(
+                value = lastName,
+                onValueChange = { data ->
+                    lastName = data
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp)
+                    .weight(1f),
+                shape = RoundedCornerShape(15.dp),
+                placeholder = {
+                    Text(".....")
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email
+                ),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = PurpleGrey80,
+                    unfocusedContainerColor = PurpleGrey80,
+                    focusedIndicatorColor = Blue,
+                    unfocusedIndicatorColor = Color.Transparent
                 )
+
+            )
             }
+
+            Spacer(modifier = Modifier .height(20.dp))
+
+            OutlinedTextField(
+                value = gender,
+                onValueChange = { data ->
+                    gender = data
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp),
+                shape = RoundedCornerShape(15.dp),
+                placeholder = {
+                    Text("gender")
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email
+                ),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = PurpleGrey80,
+                    unfocusedContainerColor = PurpleGrey80,
+                    focusedIndicatorColor = Blue,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
+
+            )
 
             Spacer(modifier = Modifier .height(20.dp))
 
@@ -233,7 +376,7 @@ fun RegistartionBody(){
                 modifier = Modifier
                     .padding(horizontal = 20.dp))
 
-            Spacer(modifier = Modifier .height(10.dp))
+            Spacer(modifier = Modifier .height(20.dp))
 
             OutlinedTextField(
                 enabled = false,
@@ -242,7 +385,8 @@ fun RegistartionBody(){
                     selectedDate = data
                 },
                 modifier = Modifier
-                    .fillMaxWidth().clickable{
+                    .fillMaxWidth()
+                    .clickable {
                         datepicker.show()
                     }
                     .padding(horizontal = 15.dp),
@@ -256,10 +400,103 @@ fun RegistartionBody(){
                     disabledContainerColor = PurpleGrey80,
                     focusedContainerColor = PurpleGrey80,
                     unfocusedContainerColor = PurpleGrey80,
-                    focusedIndicatorColor = Color.Blue,
+                    focusedIndicatorColor = Blue,
                     unfocusedIndicatorColor = Color.Transparent
                 )
+
             )
+
+            Spacer(modifier = Modifier .height(20.dp))
+
+
+
+            Spacer(modifier = Modifier .height(10.dp))
+
+            OutlinedTextField(
+                value = email,
+                onValueChange = { data ->
+                    email = data
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp),
+                shape = RoundedCornerShape(15.dp),
+                placeholder = {
+                    Text("abc@gmail.com")
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email
+                ),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = PurpleGrey80,
+                    unfocusedContainerColor = PurpleGrey80,
+                    focusedIndicatorColor = Blue,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
+
+            )
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = {
+                    password = it
+                },
+                trailingIcon = {
+                    IconButton(onClick = {
+                        visibility = !visibility
+                    }) {
+                        Icon(
+                            painter = if (visibility)
+                                painterResource(R.drawable.eye_open)
+                            else
+                                painterResource(R.drawable.eye_close),
+                            contentDescription = null
+                        )
+                    }
+                },
+                visualTransformation = if (visibility) VisualTransformation.None else PasswordVisualTransformation(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp),
+                shape = RoundedCornerShape(15.dp),
+                placeholder = {
+                    Text("*********")
+                },
+
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = PurpleGrey80,
+                    unfocusedContainerColor = PurpleGrey80,
+                    focusedIndicatorColor = Blue,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
+
+            )
+
+//            OutlinedTextField(
+//                enabled = false,
+//                value = selectedDate,
+//                onValueChange = { data ->
+//                    selectedDate = data
+//                },
+//                modifier = Modifier
+//                    .fillMaxWidth().clickable{
+//                        datepicker.show()
+//                    }
+//                    .padding(horizontal = 15.dp),
+//                shape = RoundedCornerShape(15.dp),
+//                placeholder = {
+//                    Text("dd/mm/yyyy")
+//                },
+//
+//                colors = TextFieldDefaults.colors(
+//                    disabledIndicatorColor = Color.Transparent,
+//                    disabledContainerColor = PurpleGrey80,
+//                    focusedContainerColor = PurpleGrey80,
+//                    unfocusedContainerColor = PurpleGrey80,
+//                    focusedIndicatorColor = Color.Blue,
+//                    unfocusedIndicatorColor = Color.Transparent
+//                )
+//            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -280,45 +517,72 @@ fun RegistartionBody(){
 
             Button(
                 onClick = {
-
-                    // 1️⃣ Validate empty fields
-                    if (firstname.isEmpty() || lastname.isEmpty() || selectedDate.isEmpty()) {
-                        Toast.makeText(
-                            context,
-                            "Please fill all fields",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        return@Button
-                    }
-
-                    // 2️⃣ Validate terms checkbox
                     if (!terms) {
                         Toast.makeText(
                             context,
-                            "Please agree to terms & conditions",
+                            "please agree to terms &  conditions",
                             Toast.LENGTH_SHORT
                         ).show()
-                        return@Button
+                    }else{
+                        userViewModel.register(email,password){
+                                success,message,userId->
+                            if(success){
+                                var model = UserModel(
+                                    userId = userId,
+                                    firstName = firstName,
+                                    middleName = middleName,
+                                    lastName = lastName,
+                                    gender = gender,
+                                    email = email,
+                                    dob = selectedDate,
+                                    password = password
+                                )
+                                userViewModel.addUserToDatabase(
+                                    userId,model
+                                ){
+                                        success,message->
+                                    if(success){
+                                        Toast.makeText(
+                                            context,
+                                            message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+
+                                        // Navigate to LoginActivity
+                                        val intent = Intent(context, LoginActivity::class.java)
+                                        context.startActivity(intent)
+                                        activity.finish() // Close RegistrationActivity
+
+                                    }else{
+                                        Toast.makeText(
+                                            context,
+                                            message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+                            }else{
+                                Toast.makeText(
+                                    context,
+                                    message,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+
+//                        editor.putString("email",email)
+//                        editor.putString("password",password)
+//                        editor.putString("date",selectedDate)
+//
+//                        editor.apply()
+//                        Toast.makeText(
+//                            context,
+//                            "Success",
+//                            Toast.LENGTH_SHORT
+//                        ).show()
+//                        activity.finish()
+
                     }
-
-                    // 3️⃣ Save data
-                    editor.putString("firstname", firstname)
-                    editor.putString("lastname", lastname)
-                    editor.putString("selectedDate", selectedDate)
-                    editor.apply()
-
-                    Toast.makeText(
-                        context,
-                        "Success",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                    // 4️⃣ Move to next registration step
-                    val intent = Intent(context, RegistrationActivityNew::class.java)
-                    context.startActivity(intent)
-
-                    activity.finish()
-
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -329,8 +593,79 @@ fun RegistartionBody(){
                 ),
                 shape = RoundedCornerShape(10.dp)
             ) {
-                Text("Next")
+                Text("Sign Up")
             }
+
+//            Button(
+//                onClick = {
+//                    if (!terms) {
+//                        Toast.makeText(
+//                            context,
+//                            "please agree to terms & conditions",
+//                            Toast.LENGTH_SHORT
+//                        ).show()
+//                        return@Button
+//                    }
+//
+//                    // STEP 1: Anonymous authentication
+//                    FirebaseAuth.getInstance()
+//                        .signInAnonymously()
+//                        .addOnSuccessListener {
+//
+//                            val userId = it.user!!.uid
+//
+//                            val model = UserModel(
+//                                userId = userId,
+//                                firstName = firstName,
+//                                middleName = middleName,
+//                                lastName = lastName,
+//                                gender = gender,
+//                                dob = selectedDate
+//                            )
+//
+//                            // STEP 2: Save profile data
+//                            FirebaseDatabase.getInstance().reference
+//                                .child("users")
+//                                .child(userId)
+//                                .setValue(model)
+//                                .addOnSuccessListener {
+//
+//                                    // STEP 3: Go to email/password screen
+//                                    val intent = Intent(
+//                                        context,
+//                                        RegistrationActivityNew::class.java
+//                                    )
+//                                    context.startActivity(intent)
+//                                    activity.finish()
+//                                }
+//                                .addOnFailureListener {
+//                                    Toast.makeText(
+//                                        context,
+//                                        it.message,
+//                                        Toast.LENGTH_SHORT
+//                                    ).show()
+//                                }
+//                        }
+//                        .addOnFailureListener {
+//                            Toast.makeText(
+//                                context,
+//                                it.message,
+//                                Toast.LENGTH_SHORT
+//                            ).show()
+//                        }
+//                },
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(horizontal = 15.dp)
+//                    .height(60.dp),
+//                elevation = ButtonDefaults.buttonElevation(
+//                    defaultElevation = 15.dp
+//                ),
+//                shape = RoundedCornerShape(10.dp)
+//            ) {
+//                Text("Continue")
+//            }
+
 
 
 
