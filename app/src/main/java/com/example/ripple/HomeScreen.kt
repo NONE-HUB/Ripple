@@ -17,6 +17,7 @@ fun HomeScreen() {
             .background(Color.Red)
     ) {
         Text("Home Screen")
+        Text("Home Screen baik aru")
     }
 }
 
