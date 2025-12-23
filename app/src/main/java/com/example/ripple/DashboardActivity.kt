@@ -1,6 +1,7 @@
 package com.example.ripple
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -32,6 +33,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ai37b.viewmodel.UserViewModel
+
 
 import com.example.ripple.ui.theme.RippleTheme
 
@@ -41,6 +44,7 @@ class DashboardActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             DashboardBody()
+
         }
     }
 }
@@ -51,6 +55,7 @@ fun DashboardBody() {
 
     val context = LocalContext.current
     val activity = context as? Activity
+
 
     val email = activity?.intent?.getStringExtra("email") ?: ""
     val password = activity?.intent?.getStringExtra("password") ?: ""
@@ -157,7 +162,11 @@ fun DashboardBody() {
             }
         }
     }
+
 }
+
+
+
 
 @Preview
 @Composable
