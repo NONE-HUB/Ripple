@@ -1,169 +1,175 @@
 package com.example.ripple
 
 import android.app.Activity
-import android.app.DatePickerDialog
 import android.content.Context
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ai37b.viewmodel.UserViewModel
+
+
 import com.example.ripple.ui.theme.RippleTheme
-import java.util.Calendar
 
 class DashboardActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            Dashboard()
+            DashboardBody()
+
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Dashboard() {
+fun DashboardBody() {
 
     val context = LocalContext.current
-    val activity = context as Activity
-    val sharedPreferences = context.getSharedPreferences("User", Context.MODE_PRIVATE)
-    val currentUserKey = sharedPreferences.getString("currentUser", "") ?: ""
-    val editor = sharedPreferences.edit()
+    val activity = context as? Activity
 
-    // Load current info from SharedPreferences
-    var firstname by remember { mutableStateOf(sharedPreferences.getString("firstname", "") ?: "") }
-    var middlename by remember { mutableStateOf(sharedPreferences.getString("middlename", "") ?: "") }
-    var lastname by remember { mutableStateOf(sharedPreferences.getString("lastname", "") ?: "") }
-    var username by remember { mutableStateOf(sharedPreferences.getString("username", "") ?: "") }
-    var email by remember { mutableStateOf(sharedPreferences.getString("email", "") ?: "") }
-    var password by remember { mutableStateOf(sharedPreferences.getString("password", "") ?: "") }
-    var selectedDate by remember { mutableStateOf(sharedPreferences.getString("selectedDate", "") ?: "") }
 
-    // Date picker
-    val calendar = Calendar.getInstance()
-    val datePicker = DatePickerDialog(
-        context,
-        { _, year, month, day ->
-            selectedDate = "$year/${month + 1}/$day"
-        },
-        calendar.get(Calendar.YEAR),
-        calendar.get(Calendar.MONTH),
-        calendar.get(Calendar.DAY_OF_MONTH)
+    val email = activity?.intent?.getStringExtra("email") ?: ""
+    val password = activity?.intent?.getStringExtra("password") ?: ""
+
+    val navBarHeight = 110.dp
+
+    data class NavItem(val label: String, val icon: Int, val iconsize: Dp = 25.dp)
+
+    var selectedItem by remember { mutableStateOf(0) }
+
+    var navList = listOf(
+        NavItem("Home", R.drawable.home),
+        NavItem("Create", R.drawable.create),
+        NavItem("Profile", R.drawable.circle_regular_full),
+        NavItem("Notification", R.drawable.notification),
+        NavItem("Setting", R.drawable.setting),
     )
 
-    Scaffold { padding ->
-        Column(
+//    for(int i = 0;i<navList.size;i++){
+//        navlist[i].label
+//        navList[i].icon
+//    }
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = Color.Blue,
+                    titleContentColor = Color.White,
+                    navigationIconContentColor = Color.White,
+                    actionIconContentColor = Color.White
+                ),
+                title = { Text("Ecommerce") },
+                navigationIcon = {
+                    IconButton(onClick = {
+
+                        activity?.finish()
+                    }) {
+                        Icon(
+                            painter = painterResource(R.drawable.messagebox),
+                            contentDescription = null
+                        )
+
+                    }
+                },
+                actions = {
+                    IconButton(onClick = {
+                    }) {
+                        Icon(
+                            painter = painterResource(R.drawable.messagebox),
+                            contentDescription = null
+                        )
+                    }
+                    IconButton(onClick = {
+                    }) {
+                        Icon(
+                            painter = painterResource(R.drawable.locker),
+                            contentDescription = null
+                        )
+                    }
+                }
+            )
+        },
+        bottomBar = {
+            NavigationBar(
+                modifier = Modifier.height(navBarHeight), // reduces overall height
+                tonalElevation = 0.dp // optional: remove shadow/elevation
+            ) {
+                navList.forEachIndexed { index, item ->
+                    NavigationBarItem(
+                        icon = {
+                            Icon(painter = painterResource(item.icon),
+                                contentDescription = null,
+                                modifier = Modifier
+                                    .size(32.dp)
+                                    .padding(top=5.dp))
+                        },
+                        label = {Text(item.label,
+                            fontSize = 9.sp,
+                            maxLines = 1,
+                            softWrap = false,
+                            modifier = Modifier
+                                .padding(top=0.dp,bottom=5.dp))},
+                        onClick = {
+                            selectedItem = index
+                        },
+                        selected = selectedItem == index
+                    )
+                }
+            }
+        }
+    ) { padding ->
+        Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Top,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(text = "Edit User Info", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(16.dp))
-
-            OutlinedTextField(
-                value = firstname,
-                onValueChange = { firstname = it },
-                label = { Text("First Name") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = middlename,
-                onValueChange = { middlename = it },
-                label = { Text("Middle Name") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = lastname,
-                onValueChange = { lastname = it },
-                label = { Text("Last Name") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { Text("Username") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") },
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = { datePicker.show() }) {
-                Text(text = if (selectedDate.isEmpty()) "Select Date" else selectedDate)
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(
-                onClick = {
-                    // Validate required fields
-                    if (firstname.isBlank() || lastname.isBlank() || email.isBlank() || password.isBlank()) {
-                        Toast.makeText(context, "Please fill all required fields", Toast.LENGTH_SHORT).show()
-                        return@Button
-                    }
-
-                    // Save updated info
-                    editor.putString("firstname", firstname)
-                    editor.putString("middlename", middlename)
-                    editor.putString("lastname", lastname)
-                    editor.putString("username", username)
-                    editor.putString("email", email)
-                    editor.putString("password", password)
-                    editor.putString("selectedDate", selectedDate)
-                    editor.apply()
-
-                    Toast.makeText(context, "Information updated successfully", Toast.LENGTH_SHORT).show()
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(50.dp),
-                shape = RoundedCornerShape(10.dp)
-            ) {
-                Text("Save Changes")
+        ){
+            when(selectedItem){
+                0 -> HomeScreen()
+                1 -> CreateScreen()
+                2 -> ProfileScreen()
+                3 -> NotificationScreen()
+                4 -> SettingScreen()
+                else -> HomeScreen()
             }
         }
     }
+
 }
+
+
+
 
 @Preview
 @Composable
-fun DashboardPreview(){
-    Dashboard()
+fun DashboardActivityPreview(){
+    DashboardBody()
 }
