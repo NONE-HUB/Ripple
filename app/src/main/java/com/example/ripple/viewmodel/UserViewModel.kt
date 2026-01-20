@@ -1,4 +1,4 @@
-package com.example.ai37b.viewmodel
+package com.example.ripple.viewmodel
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel

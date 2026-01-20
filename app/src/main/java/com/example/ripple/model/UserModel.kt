@@ -5,6 +5,7 @@ data class UserModel(
     val firstName : String = "",
     val middleName : String = "",
     val lastName : String = "",
+    val username: String = "",  // <-- Add this
     val email : String = "",
     val gender : String = "",
     val dob : String = "",
@@ -15,6 +16,7 @@ data class UserModel(
             "userId" to userId,
             "firstName" to firstName,
             "lastName" to lastName,
+            "username" to username,  // <-- Add this
             "email" to email,
             "gender" to gender,
             "dob" to dob,

@@ -33,4 +33,21 @@ interface UserRepo {
     fun deleteAccount(userID: String,
                       callback: (Boolean, String) -> Unit)
 
+    fun updateEmailWithReauth(
+        oldEmail: String,
+        oldPassword: String,
+        newEmail: String,
+        callback: (Boolean, String) -> Unit
+    )
+
+    fun updatePasswordWithReauth(
+        oldEmail: String,
+        oldPassword: String,
+        newPassword: String,
+        callback: (Boolean, String) -> Unit
+    )
+
+
+
 }
+

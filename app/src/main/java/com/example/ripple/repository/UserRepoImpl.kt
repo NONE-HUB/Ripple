@@ -8,6 +8,8 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.auth.EmailAuthProvider
+
 
 class UserRepoImpl : UserRepo {
 
@@ -150,4 +152,70 @@ class UserRepoImpl : UserRepo {
                 }
             }
     }
+
+    override fun updateEmailWithReauth(
+        oldEmail: String,
+        oldPassword: String,
+        newEmail: String,
+        callback: (Boolean, String) -> Unit
+    ) {
+        val user = auth.currentUser
+        if (user == null) {
+            callback(false, "User not logged in")
+            return
+        }
+
+        val credential = EmailAuthProvider.getCredential(oldEmail, oldPassword)
+
+        user.reauthenticate(credential)
+            .addOnCompleteListener { reauthTask ->
+                if (reauthTask.isSuccessful) {
+                    user.updateEmail(newEmail)
+                        .addOnCompleteListener { updateTask ->
+                            if (updateTask.isSuccessful) {
+                                callback(true, "Email updated successfully")
+                            } else {
+                                callback(false, updateTask.exception?.message ?: "Email update failed")
+                            }
+                        }
+                } else {
+                    callback(false, reauthTask.exception?.message ?: "Re-authentication failed")
+                }
+            }
+    }
+
+
+    override fun updatePasswordWithReauth(
+        oldEmail: String,
+        oldPassword: String,
+        newPassword: String,
+        callback: (Boolean, String) -> Unit
+    ) {
+        val user = auth.currentUser
+        if (user == null) {
+            callback(false, "User not logged in")
+            return
+        }
+
+        val credential = EmailAuthProvider.getCredential(oldEmail, oldPassword)
+
+        user.reauthenticate(credential)
+            .addOnCompleteListener { reauthTask ->
+                if (reauthTask.isSuccessful) {
+                    user.updatePassword(newPassword)
+                        .addOnCompleteListener { updateTask ->
+                            if (updateTask.isSuccessful) {
+                                callback(true, "Password updated successfully")
+                            } else {
+                                callback(false, updateTask.exception?.message ?: "Password update failed")
+                            }
+                        }
+                } else {
+                    callback(false, reauthTask.exception?.message ?: "Re-authentication failed")
+                }
+            }
+    }
+
+
+
 }
