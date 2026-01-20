@@ -4,34 +4,48 @@ import com.example.ripple.model.UserModel
 
 interface UserRepo {
 
-//    {
-//        "success":true,
-//    "statusCode: 200
-//        "message":"login successful"
-//    }
+    fun login(
+        email: String,
+        password: String,
+        callback: (Boolean, String) -> Unit
+    )
 
-    fun login(email: String, password: String,
-              callback:(Boolean, String) -> Unit)
+    fun register(
+        email: String,
+        password: String,
+        callback: (Boolean, String, String) -> Unit
+    )
 
-    fun register(email: String,password: String,
-                 callback: (Boolean, String, String) -> Unit)
+    fun addUserToDatabase(
+        userId: String,
+        model: UserModel,
+        callback: (Boolean, String) -> Unit
+    )
 
-    fun addUserToDatabase(userID: String, model: UserModel,
-                          callback: (Boolean, String) -> Unit)
+    fun forgetPassword(
+        email: String,
+        callback: (Boolean, String) -> Unit
+    )
 
-    fun forgetPassword(email: String,
-                       callback: (Boolean, String) -> Unit)
+    fun getUserById(
+        userId: String,
+        callback: (Boolean, String, UserModel?) -> Unit
+    )
 
-    fun getUserById(userID: String,
-                    callback: (Boolean, String, UserModel?) -> Unit)
+    fun getAllUsers(
+        callback: (Boolean, String, List<UserModel>?) -> Unit
+    )
 
-    fun getAllUser(callback: (Boolean, String, List<UserModel>) -> Unit)
+    fun editProfile(
+        userId: String,
+        model: UserModel,
+        callback: (Boolean, String) -> Unit
+    )
 
-    fun editProfile(userID: String,model: UserModel,
-                    callback: (Boolean, String) -> Unit)
-
-    fun deleteAccount(userID: String,
-                      callback: (Boolean, String) -> Unit)
+    fun deleteAccount(
+        userId: String,
+        callback: (Boolean, String) -> Unit
+    )
 
     fun updateEmailWithReauth(
         oldEmail: String,
@@ -47,7 +61,15 @@ interface UserRepo {
         callback: (Boolean, String) -> Unit
     )
 
+    fun updateProfileImage(
+        userId: String,
+        imageUrl: String?,
+        callback: (Boolean, String) -> Unit
+    )
 
-
+    fun updatePasswordInDatabase(
+        userID: String,
+        newPassword: String,
+        callback: (Boolean, String) -> Unit
+    )
 }
-

@@ -58,7 +58,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ai37b.viewmodel.UserViewModel
+import com.example.ripple.viewmodel.UserViewModel
 import com.example.ripple.model.UserModel
 import com.example.ripple.repository.UserRepoImpl
 import com.example.ripple.ui.theme.RippleTheme
