@@ -1,6 +1,8 @@
 package com.example.ripple
 
+import android.app.DatePickerDialog
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateContentSize
@@ -10,14 +12,19 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Feedback
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,17 +36,24 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.ripple.model.UserModel
+import com.example.ripple.repository.UserRepoImpl
+import com.example.ripple.viewmodel.ReportModel
 import com.example.ripple.viewmodel.UserUiState
 import com.example.ripple.viewmodel.UserViewModel
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import kotlinx.coroutines.launch
+import java.util.Calendar
 
 @Composable
 fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
@@ -48,6 +62,9 @@ fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
     var showUserInfoDialog by remember { mutableStateOf(false) }
 
     var showChangePasswordDialog by remember { mutableStateOf(false) }
+    var showEditProfileDialog by remember { mutableStateOf(false) }
+    var showTermsDialog by remember { mutableStateOf(false) }
+
 
 
 
@@ -59,6 +76,18 @@ fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
     ) { uri: Uri? ->
         userViewModel.updatePhoto(uri)
     }
+
+    val context = LocalContext.current
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    val userRepo = remember { UserRepoImpl() }
+
+    var showDialog by remember { mutableStateOf(false) }
+    var showReports by remember { mutableStateOf(false) }
+    var reportText by remember { mutableStateOf("") }
+    var reportsList by remember { mutableStateOf(listOf<ReportModel>()) }
+    var feedbackReportId by remember { mutableStateOf<String?>(null) }  // for feedback dialog
+    var feedbackText by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -82,6 +111,7 @@ fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
                     .fillMaxWidth()
                     .padding(24.dp)
             ) {
+
                 Box(contentAlignment = Alignment.BottomEnd) {
                     Image(
                         painter = rememberAsyncImagePainter(
@@ -145,7 +175,9 @@ fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
         // ===== Expandable Sections =====
         ExpandableSection(title = "Settings & Privacy") {
             OptionItem("User Information") { showUserInfoDialog = true }
-            OptionItem("Edit Profile") { /* TODO */ }
+            OptionItem("Edit Profile") {
+                showEditProfileDialog = true
+            }
             OptionItem("Change Password") {
                 showChangePasswordDialog = true
             }
@@ -154,8 +186,14 @@ fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
         Spacer(modifier = Modifier.height(16.dp))
 
         ExpandableSection(title = "Help & Support") {
-            OptionItem("Report a Problem") { /* TODO */ }
-            OptionItem("Terms & Policies") { /* TODO */ }
+            OptionItem("Report a Problem") {
+                // Open the dialog when this option is clicked
+                showDialog = true
+            }
+            OptionItem("Terms & Policies") {
+                // Open Terms & Policies dialog
+                showTermsDialog = true
+            }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -212,7 +250,6 @@ fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
         )
     }
 
-
 //
 //    if (showChangePasswordDialog) {
 //        ChangePasswordDialog(
@@ -226,6 +263,343 @@ fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
             onDismiss = { showChangePasswordDialog = false }
         )
     }
+
+    if (showEditProfileDialog) {
+        EditProfileDialog(
+            userViewModel = userViewModel,
+            onDismiss = { showEditProfileDialog = false }
+        )
+
+        if (showDialog) {
+            AlertDialog(
+                onDismissRequest = { showDialog = false },
+                title = { Text("Report a Problem") },
+                text = {
+                    OutlinedTextField(
+                        value = reportText,
+                        onValueChange = { reportText = it },
+                        placeholder = { Text("Write your problem here...") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                },
+                confirmButton = {
+                    Button(onClick = {
+                        if (reportText.isNotBlank()) {
+                            userRepo.reportProblem(userId, reportText) { success, msg ->
+                                if (success) {
+                                    Toast.makeText(context, "Report submitted", Toast.LENGTH_SHORT).show()
+                                    reportText = ""
+                                    showDialog = false
+                                } else {
+                                    Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                                }
+                            }
+                        } else {
+                            Toast.makeText(context, "Enter a problem", Toast.LENGTH_SHORT).show()
+                        }
+                    }) {
+                        Text("Submit")
+                    }
+                },
+                dismissButton = {
+                    Button(onClick = { showDialog = false }) { Text("Cancel") }
+                }
+            )
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+
+        Button(onClick = {
+            // Fetch all reports
+            userRepo.getAllReports { success, _, list ->
+                if (success) {
+                    reportsList = list
+                    showReports = true
+                } else {
+                    Toast.makeText(context, "Failed to fetch reports", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }) {
+            Text("View All Reports")
+        }
+    }
+
+    // ---------- Report Problem Dialog ----------
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            title = { Text("Report a Problem") },
+            text = {
+                OutlinedTextField(
+                    value = reportText,
+                    onValueChange = { reportText = it },
+                    placeholder = { Text("Write your problem here...") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                Button(onClick = {
+                    if (reportText.isNotBlank()) {
+                        userRepo.reportProblem(userId, reportText) { success, msg ->
+                            if (success) {
+                                Toast.makeText(context, "Report submitted", Toast.LENGTH_SHORT).show()
+                                reportText = ""
+                                showDialog = false
+                            } else {
+                                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    } else {
+                        Toast.makeText(context, "Enter a problem", Toast.LENGTH_SHORT).show()
+                    }
+                }) {
+                    Text("Submit")
+                }
+            },
+            dismissButton = {
+                Button(onClick = { showDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
+
+    // ---------- Feedback Dialog ----------
+    if (feedbackReportId != null) {
+        AlertDialog(
+            onDismissRequest = { feedbackReportId = null },
+            title = { Text("Send Feedback") },
+            text = {
+                OutlinedTextField(
+                    value = feedbackText,
+                    onValueChange = { feedbackText = it },
+                    placeholder = { Text("Write feedback here...") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                Button(onClick = {
+                    val reportId = feedbackReportId!!
+                    userRepo.sendFeedback(reportId, feedbackText) { success, msg ->
+                        if (success) {
+                            Toast.makeText(context, "Feedback sent", Toast.LENGTH_SHORT).show()
+                            feedbackReportId = null
+                            feedbackText = ""
+                        } else {
+                            Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }) { Text("Send") }
+            },
+            dismissButton = {
+                Button(onClick = { feedbackReportId = null }) { Text("Cancel") }
+            }
+        )
+    }
+
+//    // ---------- View Reports Dialog ----------
+//    if (showReports) {
+//        AlertDialog(
+//            onDismissRequest = { showReports = false },
+//            title = { Text("All Reports") },
+//            text = {
+//                Column(
+//                    modifier = Modifier
+//                        .verticalScroll(rememberScrollState())
+//                        .fillMaxWidth()
+//                        .height(400.dp)
+//                ) {
+//                    reportsList.forEachIndexed { index, report ->
+//                        Row(
+//                            modifier = Modifier
+//                                .fillMaxWidth()
+//                                .padding(vertical = 4.dp),
+//                            horizontalArrangement = Arrangement.SpaceBetween,
+//                            verticalAlignment = Alignment.CenterVertically
+//                        ) {
+//                            Column(modifier = Modifier.weight(1f)) {
+//                                Text("User ID: ${report.userId}", fontWeight = FontWeight.Bold)
+//                                Text("Message: ${report.message}")
+//                            }
+//
+//                            Row {
+//                                IconButton(onClick = {
+//                                    feedbackReportId = report.id
+//                                }) {
+//                                    Icon(Icons.Default.Feedback, contentDescription = "Feedback")
+//                                }
+//
+//                                IconButton(onClick = {
+//                                    // Delete report
+//                                    FirebaseDatabase.getInstance()
+//                                        .getReference("Reports")
+//                                        .child(report.id ?: "")
+//                                        .removeValue()
+//                                        .addOnCompleteListener { task ->
+//                                            if (task.isSuccessful) {
+//                                                Toast.makeText(context, "Report deleted", Toast.LENGTH_SHORT).show()
+//                                                reportsList = reportsList.toMutableList().apply { removeAt(index) }
+//                                            } else {
+//                                                Toast.makeText(context, task.exception?.message ?: "Delete failed", Toast.LENGTH_SHORT).show()
+//                                            }
+//                                        }
+//                                }) {
+//                                    Icon(Icons.Default.Delete, contentDescription = "Delete", tint = Color.Red)
+//                                }
+//                            }
+//                        }
+//                        Divider()
+//                    }
+//                }
+//            },
+//            confirmButton = {
+//                Button(onClick = { showReports = false }) { Text("Close") }
+//            }
+//        )
+//    }
+
+    // ---------- View Reports Dialog ----------
+    if (showReports) {
+        AlertDialog(
+            onDismissRequest = { showReports = false },
+            title = { Text("All Reports") },
+            text = {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(400.dp)
+                ) {
+                    itemsIndexed(reportsList) { index, report ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 6.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = "User ID: ${report.userId}",
+                                    fontWeight = FontWeight.Bold
+                                )
+                                Spacer(modifier = Modifier.height(2.dp))
+                                Text("Message: ${report.message}")
+                            }
+
+                            Row {
+                                IconButton(onClick = {
+                                    feedbackReportId = report.id
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Feedback,
+                                        contentDescription = "Feedback"
+                                    )
+                                }
+
+                                IconButton(onClick = {
+                                    FirebaseDatabase.getInstance()
+                                        .getReference("Reports")
+                                        .child(report.id ?: "")
+                                        .removeValue()
+                                        .addOnCompleteListener { task ->
+                                            if (task.isSuccessful) {
+                                                Toast.makeText(
+                                                    context,
+                                                    "Report deleted",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+
+                                                reportsList = reportsList
+                                                    .toMutableList()
+                                                    .apply { removeAt(index) }
+                                            } else {
+                                                Toast.makeText(
+                                                    context,
+                                                    task.exception?.message ?: "Delete failed",
+                                                    Toast.LENGTH_SHORT
+                                                ).show()
+                                            }
+                                        }
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "Delete",
+                                        tint = Color.Red
+                                    )
+                                }
+                            }
+                        }
+                        Divider()
+                    }
+                }
+            },
+            confirmButton = {
+                Button(onClick = { showReports = false }) {
+                    Text("Close")
+                }
+            }
+        )
+    }
+
+
+    // ---------- Terms & Policies Dialog ----------
+    if (showTermsDialog) {
+        AlertDialog(
+            onDismissRequest = { showTermsDialog = false },
+            title = { Text("Terms & Policies") },
+            text = {
+                // Scrollable content if text is long
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 400.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    Text(
+                        text = """
+                        1. **Introduction**  
+                        Welcome to our app. By using our service, you agree to these Terms & Policies.
+                        
+                        2. **Account Requirements**  
+                        You must be at least 13 years old to use this service. You are responsible for the confidentiality of your account.
+
+                        3. **User Content**  
+                        You retain ownership of the content you post. However, by posting, you grant us a license to use and display it.
+
+                        4. **Prohibited Activities**  
+                        Do not engage in harassment, spamming, or uploading harmful content.
+
+                        5. **Privacy**  
+                        We collect information to improve our service. Please refer to our Privacy Policy for details.
+
+                        6. **Termination**  
+                        We reserve the right to suspend or terminate accounts that violate these terms.
+
+                        7. **Modifications**  
+                        We may update these Terms & Policies periodically. Continued use of the service constitutes acceptance.
+
+                        8. **Contact Us**  
+                        For questions, contact our support team at support@example.com.
+                    """.trimIndent()
+                    )
+                }
+            },
+            confirmButton = {
+                Button(onClick = { showTermsDialog = false }) {
+                    Text("Close")
+                }
+            }
+        )
+    }
+
 
 
 }
@@ -613,3 +987,272 @@ fun ProfileField(label: String, value: String) {
         Text(text = value, fontSize = 16.sp, color = Color.Black)
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EditProfileContent(
+    userViewModel: UserViewModel,
+    onClose: () -> Unit
+) {
+    val uiState = userViewModel.uiState
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+
+    val imagePicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        userViewModel.updatePhoto(uri)
+    }
+
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    val userRepo = remember { UserRepoImpl() }
+
+    var firstName by remember { mutableStateOf("") }
+    var middleName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var selectedDate by remember { mutableStateOf("") }
+
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    // ---------- Load User Data ----------
+    LaunchedEffect(userId) {
+        if (userId.isNotEmpty()) {
+            userRepo.getUserById(userId) { success, _, user ->
+                if (success && user != null) {
+                    firstName = user.firstName
+                    middleName = user.middleName.orEmpty()
+                    lastName = user.lastName
+                    username = user.username.orEmpty()
+                    email = user.email
+                    selectedDate = user.dob.orEmpty()
+                    user.photoUrl?.let { userViewModel.updatePhoto(Uri.parse(it)) }
+                }
+            }
+        }
+    }
+
+    val calendar = Calendar.getInstance()
+    val datePicker = DatePickerDialog(
+        context,
+        { _, year, month, day ->
+            selectedDate = String.format("%04d-%02d-%02d", year, month + 1, day)
+        },
+        calendar.get(Calendar.YEAR),
+        calendar.get(Calendar.MONTH),
+        calendar.get(Calendar.DAY_OF_MONTH)
+    )
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+        // ---------- Header ----------
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Edit Profile",
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold
+            )
+            IconButton(onClick = onClose) {
+                Icon(Icons.Default.Close, contentDescription = "Close")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // ---------- Profile Photo ----------
+        Box(
+            contentAlignment = Alignment.BottomEnd,
+            modifier = Modifier.size(140.dp)
+        ) {
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = uiState.photoUrl.ifEmpty { R.drawable.circle_regular_full }
+                ),
+                contentDescription = "Profile Photo",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(140.dp)
+                    .clip(CircleShape)
+                    .border(2.dp, Color.Gray, CircleShape)
+            )
+
+            IconButton(
+                onClick = { imagePicker.launch("image/*") },
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color.White)
+            ) {
+                Icon(Icons.Default.AddAPhoto, contentDescription = "Change Photo")
+            }
+
+            if (uiState.photoUrl.isNotEmpty()) {
+                IconButton(
+                    onClick = { userViewModel.updatePhoto(null) },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .size(30.dp)
+                        .clip(CircleShape)
+                        .background(Color.White)
+                ) {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = "Remove Photo",
+                        tint = Color.Red
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // ---------- Input Fields ----------
+        OutlinedTextField(
+            value = firstName,
+            onValueChange = { firstName = it },
+            label = { Text("First Name") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = middleName,
+            onValueChange = { middleName = it },
+            label = { Text("Middle Name") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = lastName,
+            onValueChange = { lastName = it },
+            label = { Text("Last Name") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = username,
+            onValueChange = { username = it },
+            label = { Text("Username") },
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(8.dp))
+
+        OutlinedTextField(
+            value = email,
+            onValueChange = { email = it },
+            label = { Text("Email") },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            modifier = Modifier.fillMaxWidth()
+        )
+
+        Spacer(Modifier.height(16.dp))
+
+        Button(onClick = { datePicker.show() }) {
+            Text(if (selectedDate.isEmpty()) "Select Date of Birth" else selectedDate)
+        }
+
+        errorMessage?.let {
+            Spacer(Modifier.height(12.dp))
+            Text(it, color = MaterialTheme.colorScheme.error)
+        }
+
+        Spacer(Modifier.height(24.dp))
+
+        // ---------- Save Button ----------
+        Button(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(50.dp),
+            enabled = !isLoading,
+            onClick = {
+                errorMessage = null
+
+                if (firstName.isBlank() || lastName.isBlank() || email.isBlank()) {
+                    errorMessage = "Please fill all required fields"
+                    return@Button
+                }
+
+                scope.launch {
+                    isLoading = true
+                    try {
+                        val updatedUser = UserModel(
+                            userId = userId,
+                            firstName = firstName,
+                            middleName = middleName,
+                            lastName = lastName,
+                            username = username,
+                            email = email,
+                            dob = selectedDate,
+                            photoUrl = uiState.photoUrl
+                        )
+
+                        userRepo.editProfile(userId, updatedUser) { success, message ->
+                            if (success) {
+                                Toast
+                                    .makeText(context, "Profile updated", Toast.LENGTH_SHORT)
+                                    .show()
+                                onClose()
+                            } else {
+                                errorMessage = message
+                            }
+                        }
+                    } finally {
+                        isLoading = false
+                    }
+                }
+            }
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(modifier = Modifier.size(22.dp))
+            } else {
+                Text("Save Changes")
+            }
+        }
+    }
+}
+
+
+@Composable
+fun EditProfileDialog(
+    userViewModel: UserViewModel,
+    onDismiss: () -> Unit
+) {
+    Dialog(
+        onDismissRequest = onDismiss
+    ) {
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .fillMaxHeight(0.95f), // almost full screen
+            shape = RoundedCornerShape(20.dp),
+            color = MaterialTheme.colorScheme.surface
+        ) {
+            EditProfileContent(
+                userViewModel = userViewModel,
+                onClose = onDismiss
+            )
+        }
+    }
+}
+
+
+
+

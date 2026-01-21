@@ -10,7 +10,8 @@ data class UserModel(
     val gender: String = "",
     val dob: String = "",
     val password: String = "",
-    val photoUrl: String = ""        // ✅ ADD THIS
+    val photoUrl: String = "",      // ✅ ADD THIS
+    val reportProblem: String = ""   // ✅ NEW FIELD
 ) {
     fun toMap(): Map<String, Any?> {
         return mapOf(
@@ -23,7 +24,8 @@ data class UserModel(
             "gender" to gender,
             "dob" to dob,
             "password" to password,
-            "photoUrl" to photoUrl     // ✅ ADD THIS
+            "photoUrl" to photoUrl,    // ✅ ADD THIS
+            "reportProblem" to reportProblem  // ✅ ADD THIS
         )
     }
 }

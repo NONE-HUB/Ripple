@@ -1,6 +1,7 @@
 package com.example.ripple.repository
 
 import com.example.ripple.model.UserModel
+import com.example.ripple.viewmodel.ReportModel
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
@@ -163,4 +164,46 @@ class UserRepoImpl : UserRepo {
                 }
             }
     }
+
+    override fun reportProblem(
+        userId: String,
+        message: String,
+        callback: (Boolean, String) -> Unit
+    ) {
+        val reportRef = database.getReference("Reports").push()
+        val data = mapOf(
+            "id" to reportRef.key,
+            "userId" to userId,
+            "message" to message,
+            "timestamp" to System.currentTimeMillis()
+        )
+        reportRef.setValue(data).addOnCompleteListener {
+            callback(it.isSuccessful, it.exception?.message ?: "Report submitted")
+        }
+    }
+
+    override fun getAllReports(callback: (Boolean, String, List<ReportModel>) -> Unit) {
+        database.getReference("Reports")
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val reports = snapshot.children.mapNotNull { it.getValue(ReportModel::class.java) }
+                    callback(true, "Reports fetched", reports)
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    callback(false, error.message, emptyList())
+                }
+            })
+    }
+
+    override fun sendFeedback(reportId: String, feedback: String, callback: (Boolean, String) -> Unit) {
+        val ref = FirebaseDatabase.getInstance().getReference("Reports")
+        ref.child(reportId).child("feedback").setValue(feedback)
+            .addOnCompleteListener {
+                callback(it.isSuccessful, it.exception?.message ?: "Feedback sent")
+            }
+    }
+
+
+
 }
