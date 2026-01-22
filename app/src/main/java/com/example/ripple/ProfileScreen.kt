@@ -1,5 +1,9 @@
 package com.example.ripple
 
+import android.app.DatePickerDialog
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -9,6 +13,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -18,17 +25,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
-import com.example.ripple.model.UserModel
-import com.example.ripple.repository.UserRepoImpl
+import com.example.ripple.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 
 /* ---------- Design Tokens ---------- */
-
 private val GradientTop = Color(0xFFF3F6FB)
 private val GradientBottom = Color.White
 private val Surface = Color.White
@@ -39,90 +46,141 @@ private val SkeletonBase = Color(0xFFE5E7EB)
 private val SkeletonHighlight = Color(0xFFF3F4F6)
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(userViewModel: UserViewModel = viewModel()) {
+    val uiState by remember { derivedStateOf { userViewModel.uiState } } // Compose reactive state
+    val context = LocalContext.current
 
-    var user by remember { mutableStateOf<UserModel?>(null) }
-    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    val imagePicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        userViewModel.updatePhoto(uri)
+    }
 
-    LaunchedEffect(userId) {
-        if (userId.isNotEmpty()) {
-            UserRepoImpl().getUserById(userId) { success, _, fetchedUser ->
-                if (success) user = fetchedUser
-            }
-        }
+    // Date picker
+    val calendar = java.util.Calendar.getInstance()
+    val datePicker = DatePickerDialog(
+        context,
+        { _, year, month, day ->
+            userViewModel.updateDob(String.format("%04d-%02d-%02d", year, month + 1, day))
+        },
+        calendar.get(java.util.Calendar.YEAR),
+        calendar.get(java.util.Calendar.MONTH),
+        calendar.get(java.util.Calendar.DAY_OF_MONTH)
+    )
+
+    // Reload user whenever screen opens
+    LaunchedEffect(Unit) {
+        userViewModel.loadUser()
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(listOf(GradientTop, GradientBottom))
-            )
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 20.dp, vertical = 28.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        /* ---------- Header ---------- */
+        /* ---------- Profile Header ---------- */
+        Box(contentAlignment = Alignment.BottomEnd, modifier = Modifier.size(140.dp)) {
 
-        if (user == null) {
-            SkeletonProfileHeader()
-        } else {
-            ProfileHeader(user!!)
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = uiState.photoUri ?: uiState.photoUrl.ifEmpty { R.drawable.circle_regular_full }
+                ),
+                contentDescription = "Profile Photo",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(140.dp)
+                    .clip(CircleShape)
+                    .background(Color.LightGray)
+                    .border(2.dp, Color.Gray, CircleShape)
+            )
+
+            // Add photo button
+            IconButton(
+                onClick = { imagePicker.launch("image/*") },
+                modifier = Modifier
+                    .size(40.dp)
+                    .clip(CircleShape)
+                    .background(Color.White.copy(alpha = 0.9f))
+                    .border(1.dp, Color.Gray, CircleShape)
+            ) {
+                Icon(Icons.Default.AddAPhoto, contentDescription = "Add Photo", tint = Color.Black)
+            }
+
+            // Remove photo button
+            if (uiState.photoUri != null || uiState.photoUrl.isNotEmpty()) {
+                IconButton(
+                    onClick = { userViewModel.updatePhoto(null) },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .size(30.dp)
+                        .clip(CircleShape)
+                        .background(Color.White)
+                ) {
+                    Icon(Icons.Default.Delete, contentDescription = "Remove Photo", tint = Color.Red)
+                }
+            }
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(uiState.username.ifEmpty { "User" }, fontSize = 20.sp, color = Color.Black)
+        Spacer(modifier = Modifier.height(4.dp))
+        Text("Personal profile", fontSize = 14.sp, color = Color.Gray)
 
         Spacer(modifier = Modifier.height(32.dp))
 
-        /* ---------- Content ---------- */
-
-        if (user == null) {
-            SkeletonCard()
-        } else {
-            ProfileCard(user!!)
+        // Profile info card
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = RoundedCornerShape(20.dp)
+        ) {
+            Column(modifier = Modifier.padding(24.dp)) {
+                ProfileFieldItem("First name", uiState.firstName ?: "")
+                ProfileFieldItem("Middle name", uiState.middleName ?: "")
+                ProfileFieldItem("Last name", uiState.lastName ?: "")
+                ProfileFieldItem("Username", uiState.username)
+                ProfileFieldItem("Date of birth", uiState.dob ?: "")
+            }
         }
     }
 }
 
 /* -----------------------------------
-   Header with Fade-in Image
+   Header with Edit Photo
 ----------------------------------- */
-
 @Composable
-private fun ProfileHeader(user: UserModel) {
-
-    val painter = rememberAsyncImagePainter(
-        model = user.photoUrl.ifEmpty { R.drawable.circle_regular_full }
-    )
-
-    val imageAlpha by animateFloatAsState(
-        targetValue = if (painter.state is AsyncImagePainter.State.Success) 1f else 0f,
-        animationSpec = tween(durationMillis = 600, easing = FastOutSlowInEasing),
-        label = "imageFade"
-    )
-
+private fun ProfileHeader(
+    uiState: com.example.ripple.viewmodel.UserUiState,
+    imagePicker: androidx.activity.result.ActivityResultLauncher<String>,
+    userViewModel: UserViewModel
+) {
     Box(
-        modifier = Modifier
-            .size(124.dp)
-            .clip(CircleShape)
-            .background(Surface)
-            .border(1.dp, BorderSubtle, CircleShape),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.BottomEnd,
+        modifier = Modifier.size(124.dp)
     ) {
+
         Image(
-            painter = painter,
-            contentDescription = "Profile photo",
+            painter = rememberAsyncImagePainter(
+                model = uiState.photoUri ?: uiState.photoUrl.ifEmpty { R.drawable.circle_regular_full }
+            ),
+            contentDescription = "Profile Photo",
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .size(116.dp)
+                .size(124.dp)
                 .clip(CircleShape)
-                .alpha(imageAlpha)
+                .background(Color.LightGray)
+                .border(1.dp, BorderSubtle, CircleShape)
         )
+
     }
 
     Spacer(modifier = Modifier.height(16.dp))
 
     Text(
-        text = user.username,
+        text = uiState.username.ifEmpty { "User" },
         fontSize = 20.sp,
         color = PrimaryText
     )
@@ -139,9 +197,8 @@ private fun ProfileHeader(user: UserModel) {
 /* -----------------------------------
    Profile Card
 ----------------------------------- */
-
 @Composable
-private fun ProfileCard(user: UserModel) {
+private fun ProfileCard(uiState: com.example.ripple.viewmodel.UserUiState) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(20.dp),
@@ -149,26 +206,37 @@ private fun ProfileCard(user: UserModel) {
         elevation = CardDefaults.cardElevation(3.dp)
     ) {
         Column(modifier = Modifier.padding(24.dp)) {
-            ProfileFieldItem("First name", user.firstName)
-            ProfileFieldItem("Middle name", user.middleName)
-            ProfileFieldItem("Last name", user.lastName)
-            ProfileFieldItem("Username", user.username)
-            ProfileFieldItem("Date of birth", user.dob)
+            ProfileFieldItem("First name", uiState.firstName ?: "")
+            ProfileFieldItem("Middle name", uiState.middleName ?: "")
+            ProfileFieldItem("Last name", uiState.lastName ?: "")
+            ProfileFieldItem("Username", uiState.username)
+            ProfileFieldItem("Date of birth", uiState.dob ?: "")
         }
     }
 }
 
 /* -----------------------------------
-   Skeletons (Shimmer)
+   Field Item
 ----------------------------------- */
+@Composable
+private fun ProfileFieldItem(label: String, value: String) {
+    Column(modifier = Modifier.padding(vertical = 12.dp)) {
+        Text(label, fontSize = 13.sp, color = Color.Gray)
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(value.ifEmpty { "—" }, fontSize = 16.sp, color = Color.Black)
+    }
+}
 
+/* -----------------------------------
+   Skeletons
+----------------------------------- */
 @Composable
 private fun SkeletonProfileHeader() {
-    ShimmerCircle(size = 124.dp)
+    ShimmerCircle(124.dp)
     Spacer(modifier = Modifier.height(16.dp))
-    ShimmerLine(width = 120.dp)
+    ShimmerLine(120.dp)
     Spacer(modifier = Modifier.height(8.dp))
-    ShimmerLine(width = 90.dp)
+    ShimmerLine(90.dp)
 }
 
 @Composable
@@ -189,9 +257,8 @@ private fun SkeletonCard() {
 }
 
 /* -----------------------------------
-   Shimmer Components
+   Shimmer Helpers
 ----------------------------------- */
-
 @Composable
 private fun ShimmerLine(width: Dp = Dp.Unspecified) {
     Box(
@@ -215,38 +282,18 @@ private fun ShimmerCircle(size: Dp) {
 
 @Composable
 private fun shimmerBrush(): Brush {
-    val transition = rememberInfiniteTransition(label = "shimmer")
+    val transition = rememberInfiniteTransition()
     val translate by transition.animateFloat(
         initialValue = 0f,
         targetValue = 1000f,
         animationSpec = infiniteRepeatable(
             animation = tween(1200, easing = LinearEasing),
             repeatMode = RepeatMode.Restart
-        ),
-        label = "shimmerAnim"
+        )
     )
-
     return Brush.linearGradient(
-        colors = listOf(
-            SkeletonBase,
-            SkeletonHighlight,
-            SkeletonBase
-        ),
+        colors = listOf(SkeletonBase, SkeletonHighlight, SkeletonBase),
         start = androidx.compose.ui.geometry.Offset(translate - 200, 0f),
         end = androidx.compose.ui.geometry.Offset(translate, 0f)
     )
 }
-
-/* -----------------------------------
-   Field
------------------------------------ */
-
-@Composable
-private fun ProfileFieldItem(label: String, value: String) {
-    Column(modifier = Modifier.padding(vertical = 12.dp)) {
-        Text(text = label, fontSize = 13.sp, color = SecondaryText)
-        Spacer(modifier = Modifier.height(2.dp))
-        Text(text = value.ifEmpty { "—" }, fontSize = 16.sp, color = PrimaryText)
-    }
-}
-

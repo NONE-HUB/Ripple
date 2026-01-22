@@ -76,24 +76,13 @@ fun SettingScreen(
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
 
-    // Load user data once
+    // Load latest user from ViewModel
     LaunchedEffect(userId) {
         if (userId.isNotEmpty()) {
-            userRepo.getUserById(userId) { success, _, user ->
-                if (success && user != null) {
-                    firstName = user.firstName
-                    middleName = user.middleName ?: ""
-                    lastName = user.lastName
-                    username = user.username ?: ""
-                    email = user.email
-                    originalEmail = user.email
-                    selectedDate = user.dob ?: ""
-                    userViewModel.updatePhoto(user.photoUrl?.let { Uri.parse(it) })
-
-                }
-            }
+            userViewModel.loadUser() // ensures photoUrl is loaded and persistent
         }
     }
+
 
     // Date picker
     val calendar = Calendar.getInstance()
@@ -125,10 +114,7 @@ fun SettingScreen(
 
                 Image(
                     painter = rememberAsyncImagePainter(
-                        model = if (!uiState.photoUrl.isNullOrEmpty())
-                            uiState.photoUrl
-                        else
-                            R.drawable.circle_regular_full
+                        model = uiState.photoUri ?: uiState.photoUrl.ifEmpty { R.drawable.circle_regular_full }
                     ),
                     contentDescription = "Profile Photo",
                     contentScale = ContentScale.Crop,
@@ -139,39 +125,41 @@ fun SettingScreen(
                         .border(2.dp, Color.Gray, CircleShape)
                 )
 
-                // Camera Icon
-                IconButton(
-                    onClick = { imagePicker.launch("image/*") },
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.9f))
-                        .border(1.dp, Color.Gray, CircleShape)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.AddAPhoto,
-                        contentDescription = "Add Photo",
-                        tint = Color.Black
-                    )
-                }
 
-                // Remove photo icon
-                if (uiState.photoUri != null || uiState.photoUrl.isNotEmpty()) {
-                    IconButton(
-                        onClick = { userViewModel.updatePhoto(null) }, // <- pass null to remove photo
-                        modifier = Modifier
-                            .align(Alignment.TopEnd)
-                            .size(30.dp)
-                            .clip(CircleShape)
-                            .background(Color.White)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Delete,
-                            contentDescription = "Remove Photo",
-                            tint = Color.Red
-                        )
-                    }
-                }
+
+//                // Camera Icon
+//                IconButton(
+//                    onClick = { imagePicker.launch("image/*") },
+//                    modifier = Modifier
+//                        .size(40.dp)
+//                        .clip(CircleShape)
+//                        .background(Color.White.copy(alpha = 0.9f))
+//                        .border(1.dp, Color.Gray, CircleShape)
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.Default.AddAPhoto,
+//                        contentDescription = "Add Photo",
+//                        tint = Color.Black
+//                    )
+//                }
+//
+//                // Remove photo icon
+//                if (uiState.photoUri != null || uiState.photoUrl.isNotEmpty()) {
+//                    IconButton(
+//                        onClick = { userViewModel.updatePhoto(null) }, // <- pass null to remove photo
+//                        modifier = Modifier
+//                            .align(Alignment.TopEnd)
+//                            .size(30.dp)
+//                            .clip(CircleShape)
+//                            .background(Color.White)
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Default.Delete,
+//                            contentDescription = "Remove Photo",
+//                            tint = Color.Red
+//                        )
+//                    }
+//                }
 
             }
 
@@ -317,6 +305,8 @@ fun SettingScreen(
                                 return@launch
                             }
 
+                            userViewModel.loadUser()
+
                             if (email != originalEmail) {
                                 val emailResult = suspendCoroutine { cont ->
                                     userRepo.updateEmailWithReauth(
@@ -381,12 +371,14 @@ fun SettingScreen(
                 shape = RoundedCornerShape(10.dp),
                 enabled = !isLoading
             ) {
-                if (isLoading) {
+                if (uiState.isLoading) {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
+                        modifier = Modifier
+                            .size(30.dp),
+                        color = Color.White
                     )
-                } else {
+                }
+                else {
                     Text("Save Changes")
                 }
             }

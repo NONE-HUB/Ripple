@@ -58,6 +58,7 @@ import java.util.Calendar
 @Composable
 fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
 
+
     val uiState = userViewModel.uiState
     var showUserInfoDialog by remember { mutableStateOf(false) }
 
@@ -112,41 +113,50 @@ fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
                     .padding(24.dp)
             ) {
 
-                Box(contentAlignment = Alignment.BottomEnd) {
+                // Circular profile photo widget
+                Box(
+                    contentAlignment = Alignment.BottomEnd,
+                    modifier = Modifier.size(140.dp)
+                ) {
+
                     Image(
                         painter = rememberAsyncImagePainter(
-                            model = uiState.photoUrl.takeIf { it.isNotEmpty() }
-                                ?: R.drawable.circle_regular_full
+                            model = uiState.photoUri ?: uiState.photoUrl.ifEmpty { R.drawable.circle_regular_full }
                         ),
-                        contentDescription = "Profile Image",
+                        contentDescription = "Profile Photo",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
-                            .size(120.dp)
+                            .size(140.dp)
                             .clip(CircleShape)
-                            .border(2.dp, Color.Gray.copy(alpha = 0.3f), CircleShape)
+                            .background(Color.LightGray)
+                            .border(2.dp, Color.Gray, CircleShape)
                     )
 
+
+
+                    // Camera Icon
                     IconButton(
                         onClick = { imagePicker.launch("image/*") },
                         modifier = Modifier
-                            .size(36.dp)
+                            .size(40.dp)
                             .clip(CircleShape)
-                            .background(Color.White)
-                            .border(1.dp, Color.Gray.copy(alpha = 0.4f), CircleShape)
+                            .background(Color.White.copy(alpha = 0.9f))
+                            .border(1.dp, Color.Gray, CircleShape)
                     ) {
                         Icon(
                             imageVector = Icons.Default.AddAPhoto,
-                            contentDescription = "Change Photo",
+                            contentDescription = "Add Photo",
                             tint = Color.Black
                         )
                     }
 
-                    if (uiState.photoUrl.isNotEmpty()) {
+                    // Remove photo icon
+                    if (uiState.photoUri != null || uiState.photoUrl.isNotEmpty()) {
                         IconButton(
-                            onClick = { userViewModel.updatePhoto(null) },
+                            onClick = { userViewModel.updatePhoto(null) }, // <- pass null to remove photo
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
-                                .size(32.dp)
+                                .size(30.dp)
                                 .clip(CircleShape)
                                 .background(Color.White)
                         ) {
@@ -157,6 +167,7 @@ fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
                             )
                         }
                     }
+
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -1020,17 +1031,7 @@ fun EditProfileContent(
     // ---------- Load User Data ----------
     LaunchedEffect(userId) {
         if (userId.isNotEmpty()) {
-            userRepo.getUserById(userId) { success, _, user ->
-                if (success && user != null) {
-                    firstName = user.firstName
-                    middleName = user.middleName.orEmpty()
-                    lastName = user.lastName
-                    username = user.username.orEmpty()
-                    email = user.email
-                    selectedDate = user.dob.orEmpty()
-                    user.photoUrl?.let { userViewModel.updatePhoto(Uri.parse(it)) }
-                }
-            }
+            userViewModel.loadUser() // ensures photoUrl is loaded and persistent
         }
     }
 
@@ -1076,31 +1077,42 @@ fun EditProfileContent(
             contentAlignment = Alignment.BottomEnd,
             modifier = Modifier.size(140.dp)
         ) {
+
             Image(
                 painter = rememberAsyncImagePainter(
-                    model = uiState.photoUrl.ifEmpty { R.drawable.circle_regular_full }
+                    model = uiState.photoUri ?: uiState.photoUrl.ifEmpty { R.drawable.circle_regular_full }
                 ),
                 contentDescription = "Profile Photo",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(140.dp)
                     .clip(CircleShape)
+                    .background(Color.LightGray)
                     .border(2.dp, Color.Gray, CircleShape)
             )
 
+
+
+            // Camera Icon
             IconButton(
                 onClick = { imagePicker.launch("image/*") },
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(Color.White)
+                    .background(Color.White.copy(alpha = 0.9f))
+                    .border(1.dp, Color.Gray, CircleShape)
             ) {
-                Icon(Icons.Default.AddAPhoto, contentDescription = "Change Photo")
+                Icon(
+                    imageVector = Icons.Default.AddAPhoto,
+                    contentDescription = "Add Photo",
+                    tint = Color.Black
+                )
             }
 
-            if (uiState.photoUrl.isNotEmpty()) {
+            // Remove photo icon
+            if (uiState.photoUri != null || uiState.photoUrl.isNotEmpty()) {
                 IconButton(
-                    onClick = { userViewModel.updatePhoto(null) },
+                    onClick = { userViewModel.updatePhoto(null) }, // <- pass null to remove photo
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .size(30.dp)
@@ -1108,12 +1120,13 @@ fun EditProfileContent(
                         .background(Color.White)
                 ) {
                     Icon(
-                        Icons.Default.Delete,
+                        imageVector = Icons.Default.Delete,
                         contentDescription = "Remove Photo",
                         tint = Color.Red
                     )
                 }
             }
+
         }
 
         Spacer(modifier = Modifier.height(24.dp))

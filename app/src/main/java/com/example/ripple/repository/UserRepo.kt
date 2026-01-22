@@ -13,6 +13,14 @@ interface UserRepo {
         callback: (Boolean, String) -> Unit
     )
 
+    fun updateUserFields(
+        userId: String,
+        fields: Map<String, Any?>,
+        callback: (Boolean, String) -> Unit
+    )
+
+
+
     fun register(
         email: String,
         password: String,
@@ -80,6 +88,7 @@ interface UserRepo {
         imageUrl: String?,
         callback: (Boolean, String) -> Unit
     )
+
 
     fun updatePasswordInDatabase(
         userID: String,

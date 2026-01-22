@@ -46,31 +46,50 @@ class UserViewModel(private val repo: UserRepo = UserRepoImpl()) : ViewModel() {
     }
 
     /** Load current user info from repo */
-    private fun loadUser() {
-        if (userId.isEmpty()) {
-            uiState = uiState.copy(isLoading = false, error = "User not logged in")
-            return
-        }
-        viewModelScope.launch {
-            repo.getUserById(userId) { success, message, user ->
-                if (success && user != null) {
-                    uiState = uiState.copy(
-                        photoUrl = user.photoUrl ?: "",
-                        firstName = user.firstName,
-                        middleName = user.middleName,
-                        lastName = user.lastName,
-                        username = user.username,
-                        email = user.email,
-                        dob = user.dob,
-                        gender = user.gender,
-                        isLoading = false
-                    )
-                } else {
-                    uiState = uiState.copy(
-                        isLoading = false,
-                        error = message.ifEmpty { "Failed to load user" }
-                    )
-                }
+//    private fun loadUser() {
+//        if (userId.isEmpty()) {
+//            uiState = uiState.copy(isLoading = false, error = "User not logged in")
+//            return
+//        }
+//        viewModelScope.launch {
+//            repo.getUserById(userId) { success, message, user ->
+//                if (success && user != null) {
+//                    uiState = uiState.copy(
+//                        photoUrl = user.photoUrl ?: "",
+//                        firstName = user.firstName,
+//                        middleName = user.middleName,
+//                        lastName = user.lastName,
+//                        username = user.username,
+//                        email = user.email,
+//                        dob = user.dob,
+//                        gender = user.gender,
+//                        isLoading = false
+//                    )
+//                } else {
+//                    uiState = uiState.copy(
+//                        isLoading = false,
+//                        error = message.ifEmpty { "Failed to load user" }
+//                    )
+//                }
+//            }
+//        }
+//    }
+
+    fun loadUser() {
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        repo.getUserById(userId) { success, _, user ->
+            if (success && user != null) {
+                uiState = uiState.copy(
+                    photoUrl = user.photoUrl ?: "",
+                    firstName = user.firstName,
+                    middleName = user.middleName,
+                    lastName = user.lastName,
+                    username = user.username,
+                    email = user.email,
+                    dob = user.dob,
+                    gender = user.gender,
+                    isLoading = false
+                )
             }
         }
     }
@@ -97,6 +116,114 @@ class UserViewModel(private val repo: UserRepo = UserRepoImpl()) : ViewModel() {
 //        uiState = uiState.copy(photoUrl = newUrl)
 //    }
 
+//    fun updatePhoto(uri: Uri?) {
+//        if (userId.isEmpty()) {
+//            uiState = uiState.copy(error = "User not logged in")
+//            return
+//        }
+//
+//        // Show local preview immediately
+//        uiState = uiState.copy(photoUri = uri, isLoading = true)
+//
+//        if (uri == null) {
+//            // Removing photo
+//            uiState = uiState.copy(photoUrl = "", photoUri = null, isLoading = false)
+//            repo.updateProfileImage(userId, "") { success, _ -> }
+//            return
+//        }
+//
+//        // Upload to Firebase Storage
+//        val storageRef = FirebaseStorage.getInstance()
+//            .reference.child("users/$userId/profile.jpg")
+//
+//        storageRef.putFile(uri)
+//            .addOnSuccessListener {
+//                storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+//                    val url = downloadUri.toString()
+//                    repo.updateProfileImage(userId, url) { success, message ->
+//                        if (success) {
+//                            uiState = uiState.copy(photoUrl = url, isLoading = false)
+//                        } else {
+//                            uiState = uiState.copy(isLoading = false, error = "Failed to save photo URL: $message")
+//                        }
+//                    }
+//                }.addOnFailureListener { e ->
+//                    uiState = uiState.copy(isLoading = false, error = "Failed to get download URL: ${e.message}")
+//                }
+//            }
+//            .addOnFailureListener { e ->
+//                uiState = uiState.copy(isLoading = false, error = "Failed to upload image: ${e.message}")
+//            }
+//    }
+
+//    fun updatePhoto(uri: Uri?) {
+//        if (uri == null) {
+//            // Remove photo
+//            repo.updateProfileImage(userId, "") { success, _ ->
+//                if (success) {
+//                    uiState = uiState.copy(photoUrl = "")
+//                }
+//            }
+//            return
+//        }
+//
+//        // Show local preview immediately
+//        uiState = uiState.copy(photoUrl = "", photoUri = uri, isLoading = true)
+//
+//        val storageRef = FirebaseStorage.getInstance()
+//            .reference.child("users/$userId/profile.jpg")
+//
+//        storageRef.putFile(uri)
+//            .addOnSuccessListener {
+//                storageRef.downloadUrl.addOnSuccessListener { downloadUri ->
+//                    val url = downloadUri.toString()
+//                    repo.updateProfileImage(userId, url) { success, _ ->
+//                        if (success) {
+//                            uiState = uiState.copy(photoUrl = url, photoUri = null, isLoading = false)
+//                        }
+//                    }
+//                }
+//            }
+//            .addOnFailureListener {
+//                uiState = uiState.copy(isLoading = false)
+//            }
+//    }
+
+    fun updateDob(newDob: String) {
+        uiState = uiState.copy(dob = newDob)
+    }
+
+
+
+    fun updateNameAndDob(first: String, middle: String, last: String, dob: String) {
+        // Update local UI state immediately
+        uiState = uiState.copy(
+            firstName = first,
+            middleName = middle,
+            lastName = last,
+            dob = dob
+        )
+
+        // Persist to Firebase
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val updatedFields = mapOf(
+            "firstName" to first,
+            "middleName" to middle,
+            "lastName" to last,
+            "dob" to dob
+        )
+
+        repo.updateUserFields(userId, updatedFields) { success, message ->
+            if (!success) {
+                uiState = uiState.copy(error = "Failed to update profile: $message")
+            }
+        }
+    }
+
+
+
+
+
     fun updatePhoto(uri: Uri?) {
         if (userId.isEmpty()) {
             uiState = uiState.copy(error = "User not logged in")
@@ -107,13 +234,23 @@ class UserViewModel(private val repo: UserRepo = UserRepoImpl()) : ViewModel() {
         uiState = uiState.copy(photoUri = uri, isLoading = true)
 
         if (uri == null) {
-            // Removing photo
-            uiState = uiState.copy(photoUrl = "", photoUri = null, isLoading = false)
-            repo.updateProfileImage(userId, "") { success, _ -> }
+            // Remove photo from Storage
+            val storageRef = FirebaseStorage.getInstance().reference.child("users/$userId/profile.jpg")
+            storageRef.delete().addOnCompleteListener {
+                // Clear database URL after deletion
+                repo.updateProfileImage(userId, "") { success, _ ->
+                    uiState = uiState.copy(photoUrl = "", photoUri = null, isLoading = false)
+                }
+            }.addOnFailureListener {
+                // Even if deletion fails, clear database URL
+                repo.updateProfileImage(userId, "") { success, _ ->
+                    uiState = uiState.copy(photoUrl = "", photoUri = null, isLoading = false)
+                }
+            }
             return
         }
 
-        // Upload to Firebase Storage
+        // --- Upload new photo as before ---
         val storageRef = FirebaseStorage.getInstance()
             .reference.child("users/$userId/profile.jpg")
 
@@ -141,6 +278,8 @@ class UserViewModel(private val repo: UserRepo = UserRepoImpl()) : ViewModel() {
 
 
 
+
+
     /** Authentication / Account functions */
     fun login(email: String, password: String, callback: (Boolean, String) -> Unit) {
         repo.login(email, password, callback)
@@ -152,6 +291,10 @@ class UserViewModel(private val repo: UserRepo = UserRepoImpl()) : ViewModel() {
 
     fun forgetPassword(email: String, callback: (Boolean, String) -> Unit) {
         repo.forgetPassword(email, callback)
+    }
+
+    fun updateUserField(userId: String, fields: Map<String, Any>, callback: (Boolean, String) -> Unit) {
+        repo.updateUserFields(userId, fields, callback)
     }
 
     fun addUserToDatabase(userId: String, model: UserModel, callback: (Boolean, String) -> Unit) {

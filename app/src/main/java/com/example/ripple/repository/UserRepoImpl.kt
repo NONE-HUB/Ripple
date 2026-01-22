@@ -150,6 +150,22 @@ class UserRepoImpl : UserRepo {
             }
     }
 
+
+    override fun updateUserFields(
+        userId: String,
+        fields: Map<String, Any?>,
+        callback: (Boolean, String) -> Unit
+    ) {
+        val ref = FirebaseDatabase.getInstance().getReference("User")
+        ref.child(userId).updateChildren(fields)
+            .addOnCompleteListener {
+                callback(it.isSuccessful, it.exception?.message ?: "Fields updated")
+            }
+    }
+
+
+
+
     override fun updatePasswordInDatabase(
         userID: String,
         newPassword: String,
