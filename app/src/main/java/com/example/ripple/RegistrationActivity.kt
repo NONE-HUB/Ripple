@@ -167,14 +167,14 @@ fun RegistartionBody(){
 
             Spacer(modifier = Modifier .height(10.dp))
 
-            Text("Enter your username",
-                style = TextStyle(
-                    fontSize = 20.sp
-                ),
-                modifier = Modifier
-                    .padding(horizontal = 20.dp))
-
-            Spacer(modifier = Modifier .height(10.dp))
+//            Text("Enter your username",
+//                style = TextStyle(
+//                    fontSize = 20.sp
+//                ),
+//                modifier = Modifier
+//                    .padding(horizontal = 20.dp))
+//
+//            Spacer(modifier = Modifier .height(10.dp))
 
 //            Character(
 //                value = username,
@@ -183,230 +183,230 @@ fun RegistartionBody(){
 //                modifier = Modifier
 //            )
 
-            OutlinedTextField(
-                value = userId,
-                onValueChange = { data ->
-                    userId= data
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 15.dp),
-                shape = RoundedCornerShape(15.dp),
-                placeholder = {
-                    Text("userId")
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email
-                ),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = PurpleGrey80,
-                    unfocusedContainerColor = PurpleGrey80,
-                    focusedIndicatorColor = Blue,
-                    unfocusedIndicatorColor = Color.Transparent
-                )
-
-            )
-
-            Spacer(modifier = Modifier .height(20.dp))
-
-            Text("Enter your Name",
-                style = TextStyle(
-                    fontSize = 20.sp
-                ),
-                modifier = Modifier
-                    .padding(horizontal = 20.dp))
-
-            Spacer(modifier = Modifier .height(10.dp))
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceAround
-            ) {
-
-                Text("First Name",
-                    style = TextStyle(
-                        fontSize = 10.sp
-                    ))
-
-                Text("Middle Name",
-                    style = TextStyle(
-                        fontSize = 10.sp
-                    ))
-
-                Text("Last Name",
-                    style = TextStyle(
-                        fontSize = 10.sp
-                    ))
-            }
-
-            Row() {
-//                Character(
-//                    value = firstname,
-//                    onValueChange = { firstname = it },
-//                    label = ".....",
-//                    modifier = Modifier
-//                        .weight(1f)
+//            OutlinedTextField(
+//                value = userId,
+//                onValueChange = { data ->
+//                    userId= data
+//                },
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(horizontal = 15.dp),
+//                shape = RoundedCornerShape(15.dp),
+//                placeholder = {
+//                    Text("userId")
+//                },
+//                keyboardOptions = KeyboardOptions(
+//                    keyboardType = KeyboardType.Email
+//                ),
+//                colors = TextFieldDefaults.colors(
+//                    focusedContainerColor = PurpleGrey80,
+//                    unfocusedContainerColor = PurpleGrey80,
+//                    focusedIndicatorColor = Blue,
+//                    unfocusedIndicatorColor = Color.Transparent
 //                )
-
-            OutlinedTextField(
-                value = firstName,
-                onValueChange = { data ->
-                    firstName = data
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 15.dp)
-                    .weight(1f),
-                shape = RoundedCornerShape(15.dp),
-                placeholder = {
-                    Text(".....")
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email
-                ),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = PurpleGrey80,
-                    unfocusedContainerColor = PurpleGrey80,
-                    focusedIndicatorColor = Blue,
-                    unfocusedIndicatorColor = Color.Transparent
-                )
-
-            )
 //
-//                Character(
-//                    value = middlename,
-//                    onValueChange = { middlename = it },
-//                    label = ".....",
-//                    modifier = Modifier
-//                        .weight(1f)
-//                )
+//            )
 
-            OutlinedTextField(
-                value = middleName,
-                onValueChange = { data ->
-                    middleName = data
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 15.dp)
-                    .weight(1f),
-                shape = RoundedCornerShape(15.dp),
-                placeholder = {
-                    Text(".....")
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email
-                ),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = PurpleGrey80,
-                    unfocusedContainerColor = PurpleGrey80,
-                    focusedIndicatorColor = Blue,
-                    unfocusedIndicatorColor = Color.Transparent
-                )
+            Spacer(modifier = Modifier .height(20.dp))
 
-            )
+//            Text("Enter your Name",
+//                style = TextStyle(
+//                    fontSize = 20.sp
+//                ),
+//                modifier = Modifier
+//                    .padding(horizontal = 20.dp))
 //
-//                Character(
-//                    value = lastname,
-//                    onValueChange = { lastname = it },
-//                    label = ".....",
-//                    modifier = Modifier
-//                        .weight(1f)
+//            Spacer(modifier = Modifier .height(10.dp))
+//
+//            Row(
+//                modifier = Modifier
+//                    .fillMaxWidth(),
+//                horizontalArrangement = Arrangement.SpaceAround
+//            ) {
+//
+//                Text("First Name",
+//                    style = TextStyle(
+//                        fontSize = 10.sp
+//                    ))
+//
+//                Text("Middle Name",
+//                    style = TextStyle(
+//                        fontSize = 10.sp
+//                    ))
+//
+//                Text("Last Name",
+//                    style = TextStyle(
+//                        fontSize = 10.sp
+//                    ))
+//            }
+//
+//            Row() {
+////                Character(
+////                    value = firstname,
+////                    onValueChange = { firstname = it },
+////                    label = ".....",
+////                    modifier = Modifier
+////                        .weight(1f)
+////                )
+//
+//            OutlinedTextField(
+//                value = firstName,
+//                onValueChange = { data ->
+//                    firstName = data
+//                },
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(horizontal = 15.dp)
+//                    .weight(1f),
+//                shape = RoundedCornerShape(15.dp),
+//                placeholder = {
+//                    Text(".....")
+//                },
+//                keyboardOptions = KeyboardOptions(
+//                    keyboardType = KeyboardType.Email
+//                ),
+//                colors = TextFieldDefaults.colors(
+//                    focusedContainerColor = PurpleGrey80,
+//                    unfocusedContainerColor = PurpleGrey80,
+//                    focusedIndicatorColor = Blue,
+//                    unfocusedIndicatorColor = Color.Transparent
 //                )
-
-            OutlinedTextField(
-                value = lastName,
-                onValueChange = { data ->
-                    lastName = data
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 15.dp)
-                    .weight(1f),
-                shape = RoundedCornerShape(15.dp),
-                placeholder = {
-                    Text(".....")
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email
-                ),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = PurpleGrey80,
-                    unfocusedContainerColor = PurpleGrey80,
-                    focusedIndicatorColor = Blue,
-                    unfocusedIndicatorColor = Color.Transparent
-                )
-
-            )
-            }
-
-            Spacer(modifier = Modifier .height(20.dp))
-
-            OutlinedTextField(
-                value = gender,
-                onValueChange = { data ->
-                    gender = data
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 15.dp),
-                shape = RoundedCornerShape(15.dp),
-                placeholder = {
-                    Text("gender")
-                },
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email
-                ),
-                colors = TextFieldDefaults.colors(
-                    focusedContainerColor = PurpleGrey80,
-                    unfocusedContainerColor = PurpleGrey80,
-                    focusedIndicatorColor = Blue,
-                    unfocusedIndicatorColor = Color.Transparent
-                )
-
-            )
-
-            Spacer(modifier = Modifier .height(20.dp))
-
-            Text("Enter your Date of Birth",
-                style = TextStyle(
-                    fontSize = 20.sp
-                ),
-                modifier = Modifier
-                    .padding(horizontal = 20.dp))
-
-            Spacer(modifier = Modifier .height(20.dp))
-
-            OutlinedTextField(
-                enabled = false,
-                value = selectedDate,
-                onValueChange = { data ->
-                    selectedDate = data
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable {
-                        datepicker.show()
-                    }
-                    .padding(horizontal = 15.dp),
-                shape = RoundedCornerShape(15.dp),
-                placeholder = {
-                    Text("dd/mm/yyyy")
-                },
-
-                colors = TextFieldDefaults.colors(
-                    disabledIndicatorColor = Color.Transparent,
-                    disabledContainerColor = PurpleGrey80,
-                    focusedContainerColor = PurpleGrey80,
-                    unfocusedContainerColor = PurpleGrey80,
-                    focusedIndicatorColor = Blue,
-                    unfocusedIndicatorColor = Color.Transparent
-                )
-
-            )
-
-            Spacer(modifier = Modifier .height(20.dp))
+//
+//            )
+////
+////                Character(
+////                    value = middlename,
+////                    onValueChange = { middlename = it },
+////                    label = ".....",
+////                    modifier = Modifier
+////                        .weight(1f)
+////                )
+//
+//            OutlinedTextField(
+//                value = middleName,
+//                onValueChange = { data ->
+//                    middleName = data
+//                },
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(horizontal = 15.dp)
+//                    .weight(1f),
+//                shape = RoundedCornerShape(15.dp),
+//                placeholder = {
+//                    Text(".....")
+//                },
+//                keyboardOptions = KeyboardOptions(
+//                    keyboardType = KeyboardType.Email
+//                ),
+//                colors = TextFieldDefaults.colors(
+//                    focusedContainerColor = PurpleGrey80,
+//                    unfocusedContainerColor = PurpleGrey80,
+//                    focusedIndicatorColor = Blue,
+//                    unfocusedIndicatorColor = Color.Transparent
+//                )
+//
+//            )
+////
+////                Character(
+////                    value = lastname,
+////                    onValueChange = { lastname = it },
+////                    label = ".....",
+////                    modifier = Modifier
+////                        .weight(1f)
+////                )
+//
+//            OutlinedTextField(
+//                value = lastName,
+//                onValueChange = { data ->
+//                    lastName = data
+//                },
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(horizontal = 15.dp)
+//                    .weight(1f),
+//                shape = RoundedCornerShape(15.dp),
+//                placeholder = {
+//                    Text(".....")
+//                },
+//                keyboardOptions = KeyboardOptions(
+//                    keyboardType = KeyboardType.Email
+//                ),
+//                colors = TextFieldDefaults.colors(
+//                    focusedContainerColor = PurpleGrey80,
+//                    unfocusedContainerColor = PurpleGrey80,
+//                    focusedIndicatorColor = Blue,
+//                    unfocusedIndicatorColor = Color.Transparent
+//                )
+//
+//            )
+//            }
+//
+//            Spacer(modifier = Modifier .height(20.dp))
+//
+//            OutlinedTextField(
+//                value = gender,
+//                onValueChange = { data ->
+//                    gender = data
+//                },
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(horizontal = 15.dp),
+//                shape = RoundedCornerShape(15.dp),
+//                placeholder = {
+//                    Text("gender")
+//                },
+//                keyboardOptions = KeyboardOptions(
+//                    keyboardType = KeyboardType.Email
+//                ),
+//                colors = TextFieldDefaults.colors(
+//                    focusedContainerColor = PurpleGrey80,
+//                    unfocusedContainerColor = PurpleGrey80,
+//                    focusedIndicatorColor = Blue,
+//                    unfocusedIndicatorColor = Color.Transparent
+//                )
+//
+//            )
+//
+//            Spacer(modifier = Modifier .height(20.dp))
+//
+//            Text("Enter your Date of Birth",
+//                style = TextStyle(
+//                    fontSize = 20.sp
+//                ),
+//                modifier = Modifier
+//                    .padding(horizontal = 20.dp))
+//
+//            Spacer(modifier = Modifier .height(20.dp))
+//
+//            OutlinedTextField(
+//                enabled = false,
+//                value = selectedDate,
+//                onValueChange = { data ->
+//                    selectedDate = data
+//                },
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .clickable {
+//                        datepicker.show()
+//                    }
+//                    .padding(horizontal = 15.dp),
+//                shape = RoundedCornerShape(15.dp),
+//                placeholder = {
+//                    Text("dd/mm/yyyy")
+//                },
+//
+//                colors = TextFieldDefaults.colors(
+//                    disabledIndicatorColor = Color.Transparent,
+//                    disabledContainerColor = PurpleGrey80,
+//                    focusedContainerColor = PurpleGrey80,
+//                    unfocusedContainerColor = PurpleGrey80,
+//                    focusedIndicatorColor = Blue,
+//                    unfocusedIndicatorColor = Color.Transparent
+//                )
+//
+//            )
+//
+//            Spacer(modifier = Modifier .height(20.dp))
 
 
 

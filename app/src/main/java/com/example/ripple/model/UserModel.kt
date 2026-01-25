@@ -29,3 +29,27 @@ data class UserModel(
         )
     }
 }
+
+// Post data
+data class PostModel(
+    val postId: String = "",
+    val userId: String = "",
+    val username: String = "",
+    val description: String = "",
+    val mediaUrl: String = "",   // image or video URL
+    val mediaType: String = "",  // "image" or "video"
+    val timestamp: Long = System.currentTimeMillis(),
+    val likes: Map<String, Boolean> = emptyMap(), // userId -> true (like) / false (dislike)
+    val comments: List<CommentModel> = emptyList()
+)
+
+data class CommentModel(
+    val commentId: String = "",
+    val userId: String = "",
+    val username: String = "",
+    val message: String = "",
+    val timestamp: Long = System.currentTimeMillis(),
+    val likes: Map<String, Boolean> = emptyMap(),
+    val replies: List<CommentModel> = emptyList()
+)
+
