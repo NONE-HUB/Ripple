@@ -483,6 +483,7 @@ fun Greeting() {
     Spacer(modifier = Modifier .height(10.dp))
 
     Spacer(modifier = Modifier .height(10.dp))
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -491,7 +492,17 @@ fun Greeting() {
             .padding(4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
-    ) {
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ){
         Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
             modifier = Modifier
                 .size(95.dp)
