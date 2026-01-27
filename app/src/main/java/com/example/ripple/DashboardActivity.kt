@@ -33,10 +33,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ai37b.viewmodel.UserViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+
+
+import com.example.ripple.viewmodel.UserViewModel
 
 
 import com.example.ripple.ui.theme.RippleTheme
+import com.example.ripple.viewmodel.SocialViewModel
 
 class DashboardActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -55,6 +59,8 @@ fun DashboardBody() {
 
     val context = LocalContext.current
     val activity = context as? Activity
+    val socialViewModel: SocialViewModel = viewModel() // gets the ViewModel
+
 
 
     val email = activity?.intent?.getStringExtra("email") ?: ""
@@ -153,12 +159,12 @@ fun DashboardBody() {
                 .padding(padding)
         ){
             when(selectedItem){
-                0 -> HomeScreen()
+                0 -> HomeScreen(viewModel = socialViewModel)
                 1 -> CreateScreen()
                 2 -> ProfileScreen()
                 3 -> NotificationScreen()
                 4 -> SettingScreen()
-                else -> HomeScreen()
+                else -> HomeScreen(viewModel = socialViewModel)
             }
         }
     }

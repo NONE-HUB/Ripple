@@ -1,60 +1,95 @@
 package com.example.ripple
 
-import android.app.Activity
 import android.app.DatePickerDialog
-import android.content.Context
+import android.net.Uri
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import java.util.Calendar
+import androidx.lifecycle.viewmodel.compose.viewModel
+import coil.compose.rememberAsyncImagePainter
+import com.example.ripple.model.UserModel
+import com.example.ripple.repository.UserRepoImpl
+import com.example.ripple.viewmodel.UserViewModel
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingScreen() {
+fun SettingScreen(
+    userViewModel: UserViewModel = viewModel()
+) {
+    val uiState = userViewModel.uiState
     val context = LocalContext.current
-    val activity = context as Activity
-    val sharedPreferences = context.getSharedPreferences("User", Context.MODE_PRIVATE)
-    val currentUserKey = sharedPreferences.getString("currentUser", "") ?: ""
-    val editor = sharedPreferences.edit()
+    val scope = rememberCoroutineScope()
 
-    // Load current info from SharedPreferences
-    var firstname by remember { mutableStateOf(sharedPreferences.getString("firstname", "") ?: "") }
-    var middlename by remember { mutableStateOf(sharedPreferences.getString("middlename", "") ?: "") }
-    var lastname by remember { mutableStateOf(sharedPreferences.getString("lastname", "") ?: "") }
-    var username by remember { mutableStateOf(sharedPreferences.getString("username", "") ?: "") }
-    var email by remember { mutableStateOf(sharedPreferences.getString("email", "") ?: "") }
-    var password by remember { mutableStateOf(sharedPreferences.getString("password", "") ?: "") }
-    var selectedDate by remember { mutableStateOf(sharedPreferences.getString("selectedDate", "") ?: "") }
+
+    val imagePicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri: Uri? ->
+        userViewModel.updatePhoto(uri)
+    }
+
+    // Get current Firebase user
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    val userRepo = remember { UserRepoImpl() }
+
+    // Compose states for user fields
+    var firstName by remember { mutableStateOf("") }
+    var middleName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
+    var originalEmail by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var newPassword by remember { mutableStateOf("") }
+    var selectedDate by remember { mutableStateOf("") }
+
+    // UI states
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    // Load latest user from ViewModel
+    LaunchedEffect(userId) {
+        if (userId.isNotEmpty()) {
+            userViewModel.loadUser() // ensures photoUrl is loaded and persistent
+        }
+    }
+
 
     // Date picker
     val calendar = Calendar.getInstance()
     val datePicker = DatePickerDialog(
         context,
         { _, year, month, day ->
-            selectedDate = "$year/${month + 1}/$day"
+            selectedDate = String.format("%04d-%02d-%02d", year, month + 1, day)
         },
         calendar.get(Calendar.YEAR),
         calendar.get(Calendar.MONTH),
@@ -65,86 +100,288 @@ fun SettingScreen() {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(rememberScrollState())
                 .padding(padding)
                 .padding(16.dp),
-            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(text = "Edit User Info", fontSize = 24.sp, fontWeight = FontWeight.Bold)
-            Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                value = firstname,
-                onValueChange = { firstname = it },
-                label = { Text("First Name") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = middlename,
-                onValueChange = { middlename = it },
-                label = { Text("Middle Name") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = lastname,
-                onValueChange = { lastname = it },
-                label = { Text("Last Name") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = username,
-                onValueChange = { username = it },
-                label = { Text("Username") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Email") },
-                modifier = Modifier.fillMaxWidth()
-            )
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Password") },
-                modifier = Modifier.fillMaxWidth()
-            )
+            // Circular profile photo widget
+            Box(
+                contentAlignment = Alignment.BottomEnd,
+                modifier = Modifier.size(140.dp)
+            ) {
 
-            Spacer(modifier = Modifier.height(8.dp))
-            Button(onClick = { datePicker.show() }) {
-                Text(text = if (selectedDate.isEmpty()) "Select Date" else selectedDate)
+                Image(
+                    painter = rememberAsyncImagePainter(
+                        model = uiState.photoUri ?: uiState.photoUrl.ifEmpty { R.drawable.circle_regular_full }
+                    ),
+                    contentDescription = "Profile Photo",
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(140.dp)
+                        .clip(CircleShape)
+                        .background(Color.LightGray)
+                        .border(2.dp, Color.Gray, CircleShape)
+                )
+
+
+
+//                // Camera Icon
+//                IconButton(
+//                    onClick = { imagePicker.launch("image/*") },
+//                    modifier = Modifier
+//                        .size(40.dp)
+//                        .clip(CircleShape)
+//                        .background(Color.White.copy(alpha = 0.9f))
+//                        .border(1.dp, Color.Gray, CircleShape)
+//                ) {
+//                    Icon(
+//                        imageVector = Icons.Default.AddAPhoto,
+//                        contentDescription = "Add Photo",
+//                        tint = Color.Black
+//                    )
+//                }
+//
+//                // Remove photo icon
+//                if (uiState.photoUri != null || uiState.photoUrl.isNotEmpty()) {
+//                    IconButton(
+//                        onClick = { userViewModel.updatePhoto(null) }, // <- pass null to remove photo
+//                        modifier = Modifier
+//                            .align(Alignment.TopEnd)
+//                            .size(30.dp)
+//                            .clip(CircleShape)
+//                            .background(Color.White)
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Default.Delete,
+//                            contentDescription = "Remove Photo",
+//                            tint = Color.Red
+//                        )
+//                    }
+//                }
+
             }
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            Text(
+                "Edit Profile",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // --- Profile fields ---
+            OutlinedTextField(
+                value = firstName,
+                onValueChange = { firstName = it },
+                label = { Text("First Name") },
+                enabled = !isLoading,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = middleName,
+                onValueChange = { middleName = it },
+                label = { Text("Middle Name") },
+                enabled = !isLoading,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = lastName,
+                onValueChange = { lastName = it },
+                label = { Text("Last Name") },
+                enabled = !isLoading,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = username,
+                onValueChange = { username = it },
+                label = { Text("Username") },
+                enabled = !isLoading,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
+                enabled = !isLoading,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Current Password (for re-auth)") },
+                enabled = !isLoading,
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                modifier = Modifier.fillMaxWidth()
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = newPassword,
+                onValueChange = { newPassword = it },
+                label = { Text("New Password (leave blank if not changing)") },
+                enabled = !isLoading,
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = { datePicker.show() },
+                enabled = !isLoading
+            ) {
+                Text(text = if (selectedDate.isEmpty()) "Select Date of Birth" else selectedDate)
+            }
+
+            // Error message display
+            errorMessage?.let {
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error,
+                    fontSize = 14.sp
+                )
+            }
+
+            Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = {
-                    // Validate required fields
-                    if (firstname.isBlank() || lastname.isBlank() || email.isBlank() || password.isBlank()) {
+                    errorMessage = null
+
+                    if (firstName.isBlank() || lastName.isBlank() || email.isBlank() || password.isBlank()) {
                         Toast.makeText(context, "Please fill all required fields", Toast.LENGTH_SHORT).show()
                         return@Button
                     }
 
-                    // Save updated info
-                    editor.putString("firstname", firstname)
-                    editor.putString("middlename", middlename)
-                    editor.putString("lastname", lastname)
-                    editor.putString("username", username)
-                    editor.putString("email", email)
-                    editor.putString("password", password)
-                    editor.putString("selectedDate", selectedDate)
-                    editor.apply()
+                    if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+                        errorMessage = "Invalid email format"
+                        return@Button
+                    }
 
-                    Toast.makeText(context, "Information updated successfully", Toast.LENGTH_SHORT).show()
+                    if (newPassword.isNotBlank() && newPassword.length < 6) {
+                        errorMessage = "New password must be at least 6 characters"
+                        return@Button
+                    }
+
+                    isLoading = true
+
+                    scope.launch {
+                        try {
+                            val updatedUser = UserModel(
+                                userId = userId,
+                                firstName = firstName,
+                                middleName = middleName,
+                                lastName = lastName,
+                                username = username,
+                                email = email,
+                                dob = selectedDate,
+                                photoUrl = uiState.photoUrl
+                            )
+
+                            val profileResult = suspendCoroutine { cont ->
+                                userRepo.editProfile(userId, updatedUser) { success, message ->
+                                    cont.resume(success to message)
+                                }
+                            }
+
+                            if (!profileResult.first) {
+                                errorMessage = "Profile update failed: ${profileResult.second}"
+                                isLoading = false
+                                return@launch
+                            }
+
+                            userViewModel.loadUser()
+
+                            if (email != originalEmail) {
+                                val emailResult = suspendCoroutine { cont ->
+                                    userRepo.updateEmailWithReauth(
+                                        oldEmail = originalEmail,
+                                        oldPassword = password,
+                                        newEmail = email
+                                    ) { success, message ->
+                                        cont.resume(success to message)
+                                    }
+                                }
+
+                                if (!emailResult.first) {
+                                    errorMessage = "Email update failed: ${emailResult.second}"
+                                    isLoading = false
+                                    return@launch
+                                }
+                                originalEmail = email
+                            }
+
+                            if (newPassword.isNotBlank()) {
+                                val passwordResult = suspendCoroutine { cont ->
+                                    userRepo.updatePasswordWithReauth(
+                                        oldEmail = originalEmail,
+                                        oldPassword = password,
+                                        newPassword = newPassword
+                                    ) { success, message ->
+                                        cont.resume(success to message)
+                                    }
+                                }
+
+                                if (!passwordResult.first) {
+                                    errorMessage = "Password update failed: ${passwordResult.second}"
+                                    isLoading = false
+                                    return@launch
+                                }
+
+                                val dbPasswordResult = suspendCoroutine { cont ->
+                                    userRepo.updatePasswordInDatabase(userId, newPassword) { success, message ->
+                                        cont.resume(success to message)
+                                    }
+                                }
+
+                                if (!dbPasswordResult.first) {
+                                    errorMessage = "Password saved to auth but database update failed: ${dbPasswordResult.second}"
+                                }
+
+                                password = ""
+                                newPassword = ""
+                            }
+
+                            Toast.makeText(context, "Profile updated successfully!", Toast.LENGTH_SHORT).show()
+                        } catch (e: Exception) {
+                            errorMessage = "An error occurred: ${e.message}"
+                        } finally {
+                            isLoading = false
+                        }
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
-                shape = RoundedCornerShape(10.dp)
+                shape = RoundedCornerShape(10.dp),
+                enabled = !isLoading
             ) {
-                Text("Save Changes")
+                if (uiState.isLoading) {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .size(30.dp),
+                        color = Color.White
+                    )
+                }
+                else {
+                    Text("Save Changes")
+                }
             }
         }
     }
 }
-

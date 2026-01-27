@@ -36,8 +36,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.ai37b.view.ui.theme.PurpleGrey80
-import com.example.ai37b.viewmodel.UserViewModel
+import com.example.ripple.viewmodel.UserViewModel
 import com.example.ripple.repository.UserRepoImpl
 
 class ForgetPasswordActivity : ComponentActivity() {
@@ -83,8 +82,8 @@ fun ForgetPasswordBody() {
                         .fillMaxWidth()
                         .padding(horizontal = 15.dp),
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = PurpleGrey80,
-                        unfocusedContainerColor = PurpleGrey80,
+                        focusedContainerColor = Blue,
+                        unfocusedContainerColor = Blue,
                         focusedIndicatorColor = Blue,
                         unfocusedIndicatorColor = Color.Transparent
                     )

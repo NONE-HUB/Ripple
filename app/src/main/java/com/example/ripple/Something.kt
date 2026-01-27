@@ -40,13 +40,8 @@ class Something : ComponentActivity() {
 
 @Composable
 fun Greeting() {
-    Text("Enter your username",
-        style = TextStyle(
-            fontSize = 20.sp
-        ),
-        modifier = Modifier
-            .padding(horizontal = 20.dp))
 
+<<<<<<< HEAD
     Spacer(modifier = Modifier .height(10.dp))
 
     Spacer(modifier = Modifier .height(10.dp))
@@ -430,6 +425,8 @@ fun Greeting() {
                 .clip(shape = CircleShape),
             contentScale = ContentScale.Crop)
     }
+=======
+>>>>>>> master
 }
 
 @Preview(showBackground = true)
