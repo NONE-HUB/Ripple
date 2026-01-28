@@ -68,9 +68,8 @@ fun DashboardBody() {
 
     data class NavItem(val label: String, val icon: Int, val iconsize: Dp = 25.dp)
 
-    var selectedItem by remember { mutableStateOf(1) }
+    var selectedItem by remember { mutableStateOf(1) } // Default to CreateScreen
 
-    // Remove "Setting" tab
     val navList = listOf(
         NavItem("Home", R.drawable.home),
         NavItem("Create", R.drawable.create),
@@ -83,33 +82,9 @@ fun DashboardBody() {
             CenterAlignedTopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Blue,
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White,
-                    actionIconContentColor = Color.White
+                    titleContentColor = Color.White
                 ),
-                title = { Text("Ecommerce") },
-                navigationIcon = {
-                    IconButton(onClick = { activity?.finish() }) {
-                        Icon(
-                            painter = painterResource(R.drawable.messagebox),
-                            contentDescription = null
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            painter = painterResource(R.drawable.messagebox),
-                            contentDescription = null
-                        )
-                    }
-                    IconButton(onClick = {}) {
-                        Icon(
-                            painter = painterResource(R.drawable.locker),
-                            contentDescription = null
-                        )
-                    }
-                }
+                title = { Text("Ripple") } // Changed from "Ecommerce" to "Ripple"
             )
         },
         bottomBar = {
@@ -155,12 +130,12 @@ fun DashboardBody() {
                 1 -> CreateScreen()
                 2 -> ProfileScreen()
                 3 -> NotificationScreen()
-                // No "Setting" tab anymore
                 else -> HomeScreen(userViewModel)
             }
         }
     }
 }
+
 
 
 
