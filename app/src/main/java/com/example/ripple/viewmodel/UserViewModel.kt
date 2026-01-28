@@ -1,23 +1,27 @@
 package com.example.ripple.viewmodel
 
+import UserModel
+import android.content.Context
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ripple.model.UserModel
+import com.example.ripple.clearSavedProfileImage
 import com.example.ripple.repository.UserRepo
 import com.example.ripple.repository.UserRepoImpl
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import com.google.firebase.storage.FirebaseStorage
+import java.io.File
 
 
 // UI state for Compose
 data class UserUiState(
     val photoUrl: String = "", // URL from Firebase
     val photoUri: Uri? = null, // Local Uri for preview
+    val localPhotoPath: String? = null,   // ✅ ADD THIS
     val isLoading: Boolean = true,
     val error: String? = null,
     val userId: String = "",
@@ -28,6 +32,7 @@ data class UserUiState(
     val lastName: String? = null,
     val dob: String? = null,
     val gender: String? = null,
+    val imageVersion: Int = 0 ,// <-- add this
 )
 
 
@@ -37,13 +42,16 @@ class UserViewModel(private val repo: UserRepo = UserRepoImpl()) : ViewModel() {
 
     private val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
+
     // Compose state
     var uiState by mutableStateOf(UserUiState())
-        private set
+
 
     init {
         loadUser()
     }
+
+
 
     /** Load current user info from repo */
 //    private fun loadUser() {
@@ -93,7 +101,6 @@ class UserViewModel(private val repo: UserRepo = UserRepoImpl()) : ViewModel() {
             }
         }
     }
-
 
     /** Delete current user account */
     fun deleteAccount(onComplete: (Boolean, String) -> Unit) {
@@ -189,6 +196,28 @@ class UserViewModel(private val repo: UserRepo = UserRepoImpl()) : ViewModel() {
 //            }
 //    }
 
+    fun setLocalPhoto(path: String) {
+        val uri = Uri.fromFile(File(path))
+        uiState = uiState.copy(
+            localPhotoPath = path,
+            photoUri = uri,
+            photoUrl = "",
+            imageVersion = uiState.imageVersion + 1
+        )
+    }
+
+    fun clearPhoto(context: Context) {
+        uiState.localPhotoPath?.let { File(it).delete() }
+        uiState = uiState.copy(
+            localPhotoPath = null,
+            photoUri = null,
+            photoUrl = "",
+            imageVersion = uiState.imageVersion + 1
+        )
+        clearSavedProfileImage(context)
+    }
+
+
     fun updateDob(newDob: String) {
         uiState = uiState.copy(dob = newDob)
     }
@@ -234,21 +263,22 @@ class UserViewModel(private val repo: UserRepo = UserRepoImpl()) : ViewModel() {
         uiState = uiState.copy(photoUri = uri, isLoading = true)
 
         if (uri == null) {
-            // Remove photo from Storage
+            // Clear UI immediately
+            uiState = uiState.copy(photoUri = null, photoUrl = "", isLoading = true)
+
+            // Delete from Firebase in background
             val storageRef = FirebaseStorage.getInstance().reference.child("users/$userId/profile.jpg")
             storageRef.delete().addOnCompleteListener {
-                // Clear database URL after deletion
                 repo.updateProfileImage(userId, "") { success, _ ->
-                    uiState = uiState.copy(photoUrl = "", photoUri = null, isLoading = false)
+                    // Optional: just reset loading
+                    uiState = uiState.copy(isLoading = false)
                 }
             }.addOnFailureListener {
-                // Even if deletion fails, clear database URL
-                repo.updateProfileImage(userId, "") { success, _ ->
-                    uiState = uiState.copy(photoUrl = "", photoUri = null, isLoading = false)
-                }
+                uiState = uiState.copy(isLoading = false)
             }
             return
         }
+
 
         // --- Upload new photo as before ---
         val storageRef = FirebaseStorage.getInstance()

@@ -1,5 +1,4 @@
-package com.example.ripple.model
-
+// UserModel.kt
 data class UserModel(
     val userId: String = "",
     val firstName: String = "",
@@ -10,8 +9,8 @@ data class UserModel(
     val gender: String = "",
     val dob: String = "",
     val password: String = "",
-    val photoUrl: String = "",      // ✅ ADD THIS
-    val reportProblem: String = ""   // ✅ NEW FIELD
+    val photoUrl: String = "",
+    val reportProblem: String = "",
 ) {
     fun toMap(): Map<String, Any?> {
         return mapOf(
@@ -24,32 +23,14 @@ data class UserModel(
             "gender" to gender,
             "dob" to dob,
             "password" to password,
-            "photoUrl" to photoUrl,    // ✅ ADD THIS
-            "reportProblem" to reportProblem  // ✅ ADD THIS
+            "photoUrl" to photoUrl,
+            "reportProblem" to reportProblem,
         )
     }
 }
 
-// Post data
-data class PostModel(
-    val postId: String = "",
-    val userId: String = "",
-    val username: String = "",
-    val description: String = "",
-    val mediaUrl: String = "",   // image or video URL
-    val mediaType: String = "",  // "image" or "video"
-    val timestamp: Long = System.currentTimeMillis(),
-    val likes: Map<String, Boolean> = emptyMap(), // userId -> true (like) / false (dislike)
-    val comments: List<CommentModel> = emptyList()
-)
 
-data class CommentModel(
-    val commentId: String = "",
-    val userId: String = "",
-    val username: String = "",
-    val message: String = "",
-    val timestamp: Long = System.currentTimeMillis(),
-    val likes: Map<String, Boolean> = emptyMap(),
-    val replies: List<CommentModel> = emptyList()
-)
+
+
+
 

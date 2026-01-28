@@ -1,207 +1,256 @@
 package com.example.ripple
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import android.graphics.BitmapFactory
+import android.net.Uri
+import androidx.activity.compose.ManagedActivityResultLauncher
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.ripple.viewmodel.SocialViewModel
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import android.net.Uri
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
-import androidx.compose.foundation.clickable
-import androidx.compose.material3.*
-import com.example.ripple.model.CommentModel
-import com.example.ripple.model.PostModel
+import com.example.ripple.model.Posted
+import com.example.ripple.repository.PostRepoImpl
+import com.example.ripple.viewmodel.UserUiState
+import com.example.ripple.viewmodel.UserViewModel
+import java.io.File
+import java.util.*
 
 @Composable
-fun HomeScreen(viewModel: SocialViewModel) {
-    val showPopup = remember { mutableStateOf(false) }
+fun HomeScreen(userViewModel: UserViewModel) {
+    val context = LocalContext.current
+    val postRepo = PostRepoImpl()
+    val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: ""
+
+    var showDialog by remember { mutableStateOf(false) }
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+    var description by remember { mutableStateOf("") }
+    var posts by remember { mutableStateOf(listOf<Posted>()) }
+    var showSuccess by remember { mutableStateOf(false) }
+
+    // Load all posts from Firebase on start
+    LaunchedEffect(Unit) {
+        postRepo.getAllPosts { data ->
+            posts = data
+        }
+    }
+
+
+    // Image picker launcher
+    val imagePicker: ManagedActivityResultLauncher<String, Uri?> =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
+            selectedImageUri = uri
+        }
 
     Box(modifier = Modifier.fillMaxSize()) {
-        // Post feed
-        LazyColumn {
-            items(viewModel.posts.value) { post ->
-                PostItem(post = post, viewModel = viewModel)
+
+        // Posts list
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(posts.reversed()) { post ->
+                PostCardWithProfile(
+                    userViewModel = userViewModel,
+                    uiState = UserUiState(
+                        photoUrl = post.userPhotoUrl ?: "",
+                        photoUri = null,
+                        username = post.userName ?: ""
+                    ),
+                    description = post.description,
+                    imagePath = post.imageLocalPath
+                )
             }
         }
 
-        // Floating + button
+        // Floating add button
         Icon(
-            painter = painterResource(id = R.drawable.eye_open),
+            painter = rememberAsyncImagePainter(R.drawable.create),
             contentDescription = "Add Post",
             modifier = Modifier
-                .align(Alignment.BottomStart)
+                .align(Alignment.BottomEnd)
                 .padding(16.dp)
-                .clickable { showPopup.value = true },
-            tint = Color.Blue
+                .size(56.dp)
+                .clickable { showDialog = true }
         )
+    }
 
-        // Post creation popup
-        if (showPopup.value) {
-            PostCreationPopup(
-                onDismiss = { showPopup.value = false },
-                onPost = { description, mediaUri, mediaType ->
-                    viewModel.createPost(description, mediaUri, mediaType)
-                    showPopup.value = false
+    // Add post dialog
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    if (userId.isEmpty()) return@TextButton
+
+                    // Save image locally
+                    var localPath: String? = null
+                    selectedImageUri?.let { uri ->
+                        val inputStream = context.contentResolver.openInputStream(uri)
+                        val file = File(context.filesDir, "${UUID.randomUUID()}.jpg")
+                        inputStream?.use { input -> file.outputStream().use { output -> input.copyTo(output) } }
+                        localPath = file.absolutePath
+                    }
+
+                    val post = Posted(
+                        userId = userId,
+                        description = description,
+                        imageLocalPath = localPath,
+                        userPhotoUrl = userViewModel.uiState.photoUrl,
+                        userName = userViewModel.uiState.username
+                    )
+
+
+                    postRepo.addPost(post) { success, msg ->
+                        if (success) {
+                            posts = posts + post
+                            showSuccess = true
+                        }
+                        showDialog = false
+                        selectedImageUri = null
+                        description = ""
+                    }
+                }) {
+                    Text("Post")
                 }
-            )
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showDialog = false
+                    selectedImageUri = null
+                    description = ""
+                }) {
+                    Text("Cancel")
+                }
+            },
+            text = {
+                Column {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp)
+                            .clickable { imagePicker.launch("image/*") },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        if (selectedImageUri != null) {
+                            val bitmap = context.contentResolver.openInputStream(selectedImageUri!!)?.use { input ->
+                                BitmapFactory.decodeStream(input)
+                            }
+                            bitmap?.let {
+                                Image(
+                                    bitmap = it.asImageBitmap(),
+                                    contentDescription = null,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
+                        } else {
+                            Text("Click to select image")
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    OutlinedTextField(
+                        value = description,
+                        onValueChange = { description = it },
+                        label = { Text("Description") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            shape = RoundedCornerShape(16.dp)
+        )
+    }
+
+    if (showSuccess) {
+        Snackbar(
+            modifier = Modifier.padding(16.dp),
+            action = {
+                TextButton(onClick = { showSuccess = false }) {
+                    Text("OK", color = Color.White)
+                }
+            }
+        ) {
+            Text("Post added successfully!", color = Color.White)
         }
     }
 }
 
 @Composable
-fun PostCreationPopup(
-    onDismiss: () -> Unit,
-    onPost: (description: String, mediaUri: Uri?, mediaType: String) -> Unit
+fun PostCardWithProfile(
+    userViewModel: UserViewModel,
+    uiState: UserUiState,
+    description: String,
+    imagePath: String?
 ) {
-    var description by remember { mutableStateOf("") }
-    var mediaUri by remember { mutableStateOf<Uri?>(null) }
-    var mediaType by remember { mutableStateOf("image") }
-
-    Dialog(onDismissRequest = onDismiss) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(0xFFEFEFEF), RoundedCornerShape(8.dp))
+            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Circular profile photo
+        Box(
+            contentAlignment = Alignment.BottomEnd,
+            modifier = Modifier.size(80.dp)
         ) {
-            // Media preview
-            if (mediaUri != null) {
+            Image(
+                painter = rememberAsyncImagePainter(
+                    model = uiState.photoUrl.ifEmpty { R.drawable.circle_regular_full }
+                ),
+                contentDescription = "Profile Photo",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape)
+                    .background(Color.LightGray)
+                    .border(2.dp, Color.Gray, CircleShape)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Description on top
+        Text(text = description, fontSize = 16.sp, color = Color.Black)
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Image below description
+        imagePath?.let { path ->
+            val bitmap = BitmapFactory.decodeFile(path)
+            bitmap?.let {
                 Image(
-                    painter = rememberAsyncImagePainter(mediaUri),
-                    contentDescription = null,
+                    bitmap = it.asImageBitmap(),
+                    contentDescription = "Post Image",
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
+                        .clip(RoundedCornerShape(8.dp)),
+                    contentScale = ContentScale.Crop
                 )
             }
-
-            OutlinedTextField(
-                value = description,
-                onValueChange = { description = it },
-                label = { Text("Description") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp)
-            )
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Button(onClick = { onPost(description, mediaUri, mediaType) }) {
-                    Text("Post")
-                }
-                Button(onClick = onDismiss) {
-                    Text("Exit")
-                }
-            }
-        }
-    }
-}
-@Composable
-fun PostItem(post: PostModel, viewModel: SocialViewModel) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(8.dp)) {
-
-        Text(text = post.username, style = MaterialTheme.typography.titleMedium)
-        Text(text = post.description, style = MaterialTheme.typography.bodyMedium)
-
-        if (post.mediaUrl.isNotEmpty()) {
-            Image(
-                painter = rememberAsyncImagePainter(post.mediaUrl),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-            )
-        }
-
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            val liked = post.likes[viewModel.userId] == true
-            Button(onClick = { viewModel.likePost(post.postId, true) }) {
-                Text("Like (${post.likes.count { it.value }})")
-            }
-            Button(onClick = { viewModel.likePost(post.postId, false) }) {
-                Text("Dislike (${post.likes.count { !it.value }})")
-            }
-        }
-
-        // Comments
-        post.comments.forEach { comment ->
-            CommentItem(postId = post.postId, comment = comment, viewModel = viewModel)
-        }
-
-        // Add new comment
-        var commentText by remember { mutableStateOf("") }
-        OutlinedTextField(
-            value = commentText,
-            onValueChange = { commentText = it },
-            placeholder = { Text("Add a comment") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Button(onClick = {
-            if (commentText.isNotBlank()) {
-                viewModel.addComment(post.postId, commentText)
-                commentText = ""
-            }
-        }) {
-            Text("Comment")
-        }
-    }
-}
-
-@Composable
-fun CommentItem(postId: String, comment: CommentModel, viewModel: SocialViewModel) {
-    Column(modifier = Modifier
-        .fillMaxWidth()
-        .padding(start = 16.dp, top = 4.dp)) {
-
-        Text(text = "${comment.username}: ${comment.message}")
-
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            val liked = comment.likes[viewModel.userId] == true
-            Button(onClick = { viewModel.likeComment(postId, comment.commentId, true) }) {
-                Text("Like (${comment.likes.count { it.value }})")
-            }
-            Button(onClick = { viewModel.likeComment(postId, comment.commentId, false) }) {
-                Text("Dislike (${comment.likes.count { !it.value }})")
-            }
-        }
-
-        // Replies
-        comment.replies.forEach { reply ->
-            CommentItem(postId = postId, comment = reply, viewModel = viewModel)
-        }
-
-        // Reply input
-        var replyText by remember { mutableStateOf("") }
-        OutlinedTextField(
-            value = replyText,
-            onValueChange = { replyText = it },
-            placeholder = { Text("Reply") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Button(onClick = {
-            if (replyText.isNotBlank()) {
-                viewModel.replyToComment(postId, comment.commentId, replyText)
-                replyText = ""
-            }
-        }) {
-            Text("Reply")
         }
     }
 }

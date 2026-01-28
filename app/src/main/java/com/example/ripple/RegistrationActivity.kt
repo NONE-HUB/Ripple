@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import UserModel
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -59,7 +60,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ripple.viewmodel.UserViewModel
-import com.example.ripple.model.UserModel
+
 import com.example.ripple.repository.UserRepoImpl
 import com.example.ripple.ui.theme.RippleTheme
 import com.example.ripple.ui.theme.PurpleGrey80

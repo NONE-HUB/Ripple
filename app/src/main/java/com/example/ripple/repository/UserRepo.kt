@@ -1,6 +1,6 @@
 package com.example.ripple.repository
 
-import com.example.ripple.model.UserModel
+import UserModel
 import com.example.ripple.viewmodel.ReportModel
 import com.example.ripple.viewmodel.UserViewModel
 import com.google.firebase.database.FirebaseDatabase
@@ -18,7 +18,6 @@ interface UserRepo {
         fields: Map<String, Any?>,
         callback: (Boolean, String) -> Unit
     )
-
 
 
     fun register(
