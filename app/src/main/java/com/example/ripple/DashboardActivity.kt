@@ -81,7 +81,7 @@ fun DashboardBody() {
         topBar = {
             CenterAlignedTopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Blue,
+                    containerColor = Color.Black,
                     titleContentColor = Color.White
                 ),
                 title = { Text("Ripple") } // Changed from "Ecommerce" to "Ripple"
