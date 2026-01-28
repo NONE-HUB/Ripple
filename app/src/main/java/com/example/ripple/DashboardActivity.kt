@@ -60,33 +60,24 @@ fun DashboardBody() {
     val context = LocalContext.current
     val activity = context as? Activity
 
-
-
-
     val email = activity?.intent?.getStringExtra("email") ?: ""
     val password = activity?.intent?.getStringExtra("password") ?: ""
 
     val navBarHeight = 110.dp
-
     val userViewModel: UserViewModel = viewModel()
-
 
     data class NavItem(val label: String, val icon: Int, val iconsize: Dp = 25.dp)
 
-    var selectedItem by remember { mutableStateOf(0) }
+    var selectedItem by remember { mutableStateOf(1) }
 
-    var navList = listOf(
+    // Remove "Setting" tab
+    val navList = listOf(
         NavItem("Home", R.drawable.home),
         NavItem("Create", R.drawable.create),
         NavItem("Profile", R.drawable.circle_regular_full),
-        NavItem("Notification", R.drawable.notification),
-        NavItem("Setting", R.drawable.setting),
+        NavItem("Notification", R.drawable.notification)
     )
 
-//    for(int i = 0;i<navList.size;i++){
-//        navlist[i].label
-//        navList[i].icon
-//    }
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -98,27 +89,21 @@ fun DashboardBody() {
                 ),
                 title = { Text("Ecommerce") },
                 navigationIcon = {
-                    IconButton(onClick = {
-
-                        activity?.finish()
-                    }) {
+                    IconButton(onClick = { activity?.finish() }) {
                         Icon(
                             painter = painterResource(R.drawable.messagebox),
                             contentDescription = null
                         )
-
                     }
                 },
                 actions = {
-                    IconButton(onClick = {
-                    }) {
+                    IconButton(onClick = {}) {
                         Icon(
                             painter = painterResource(R.drawable.messagebox),
                             contentDescription = null
                         )
                     }
-                    IconButton(onClick = {
-                    }) {
+                    IconButton(onClick = {}) {
                         Icon(
                             painter = painterResource(R.drawable.locker),
                             contentDescription = null
@@ -129,27 +114,31 @@ fun DashboardBody() {
         },
         bottomBar = {
             NavigationBar(
-                modifier = Modifier.height(navBarHeight), // reduces overall height
-                tonalElevation = 0.dp // optional: remove shadow/elevation
+                modifier = Modifier.height(navBarHeight),
+                tonalElevation = 0.dp
             ) {
                 navList.forEachIndexed { index, item ->
                     NavigationBarItem(
                         icon = {
-                            Icon(painter = painterResource(item.icon),
+                            Icon(
+                                painter = painterResource(item.icon),
                                 contentDescription = null,
                                 modifier = Modifier
                                     .size(32.dp)
-                                    .padding(top=5.dp))
+                                    .padding(top = 5.dp)
+                            )
                         },
-                        label = {Text(item.label,
-                            fontSize = 9.sp,
-                            maxLines = 1,
-                            softWrap = false,
-                            modifier = Modifier
-                                .padding(top=0.dp,bottom=5.dp))},
-                        onClick = {
-                            selectedItem = index
+                        label = {
+                            Text(
+                                item.label,
+                                fontSize = 9.sp,
+                                maxLines = 1,
+                                softWrap = false,
+                                modifier = Modifier
+                                    .padding(top = 0.dp, bottom = 5.dp)
+                            )
                         },
+                        onClick = { selectedItem = index },
                         selected = selectedItem == index
                     )
                 }
@@ -160,19 +149,19 @@ fun DashboardBody() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-        ){
-            when(selectedItem){
+        ) {
+            when (selectedItem) {
                 0 -> HomeScreen(userViewModel)
                 1 -> CreateScreen()
                 2 -> ProfileScreen()
                 3 -> NotificationScreen()
-                4 -> SettingScreen()
+                // No "Setting" tab anymore
                 else -> HomeScreen(userViewModel)
             }
         }
     }
-
 }
+
 
 
 
