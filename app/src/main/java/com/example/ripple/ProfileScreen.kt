@@ -41,8 +41,10 @@ fun ProfileScreen(
     val uiState = userViewModel.uiState
     val context = LocalContext.current
 
-    // 🔑 Controls CreateScreen popup visibility
-    var showCreatePopup by remember { mutableStateOf(true) }
+    var showCreatePopup by remember {
+        mutableStateOf(!hasSeenProfilePopup(context))
+    }
+
 
     // Reload user when screen opens
     LaunchedEffect(Unit) {
@@ -84,6 +86,7 @@ fun ProfileScreen(
             showDialog = showCreatePopup,
             onDismiss = {
                 showCreatePopup = false
+                markProfilePopupSeen(context)   // ✅ THIS IS THE KEY LINE
                 userViewModel.loadUser()
             }
         )
@@ -196,4 +199,14 @@ private fun ProfileFieldItem(
         Spacer(modifier = Modifier.height(2.dp))
         Text(value.ifEmpty { "—" }, fontSize = 16.sp, color = Color.Black)
     }
+}
+
+private fun hasSeenProfilePopup(context: android.content.Context): Boolean {
+    val prefs = context.getSharedPreferences("profile_prefs", android.content.Context.MODE_PRIVATE)
+    return prefs.getBoolean("profile_popup_shown", false)
+}
+
+private fun markProfilePopupSeen(context: android.content.Context) {
+    val prefs = context.getSharedPreferences("profile_prefs", android.content.Context.MODE_PRIVATE)
+    prefs.edit().putBoolean("profile_popup_shown", true).apply()
 }
