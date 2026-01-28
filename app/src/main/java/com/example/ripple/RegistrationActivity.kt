@@ -134,39 +134,39 @@ fun RegistartionBody(){
                 .padding(paddingValues = padding)
         ) {
 
-            Spacer(modifier = Modifier .height(10.dp))
+            Spacer(modifier = Modifier .height(60.dp))
 
-//            Text("English(UK)",
-//                style = TextStyle(
-//                    textAlign = TextAlign.Center,
-//                    fontWeight = FontWeight.Bold,
-//                    fontSize = 18.sp,
-//                    color = Color.Gray
-//                ),
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//
-//            )
+            Text("English(UK)",
+                style = TextStyle(
+                    textAlign = TextAlign.Center,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    color = Color.Gray
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
 
-            Spacer(modifier = Modifier .height(10.dp))
+            )
 
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .size(105.dp)
-//                    .clip(CircleShape)
-//                    .padding(4.dp),
-//                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.Center
-//            ) {
-//                Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
-//                    modifier = Modifier
-//                        .size(95.dp)
-//                        .clip(shape = CircleShape),
-//                    contentScale = ContentScale.Crop)
-//            }
+            Spacer(modifier = Modifier .height(60.dp))
 
-            Spacer(modifier = Modifier .height(10.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .size(105.dp)
+                    .clip(CircleShape)
+                    .padding(4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+                    modifier = Modifier
+                        .size(95.dp)
+                        .clip(shape = CircleShape),
+                    contentScale = ContentScale.Crop)
+            }
+
+            Spacer(modifier = Modifier .height(60.dp))
 
 //            Text("Enter your username",
 //                style = TextStyle(
@@ -208,7 +208,7 @@ fun RegistartionBody(){
 //
 //            )
 
-            Spacer(modifier = Modifier .height(20.dp))
+//            Spacer(modifier = Modifier .height(20.dp))
 
 //            Text("Enter your Name",
 //                style = TextStyle(
@@ -411,7 +411,7 @@ fun RegistartionBody(){
 
 
 
-            Spacer(modifier = Modifier .height(10.dp))
+
 
             OutlinedTextField(
                 value = email,
@@ -436,6 +436,8 @@ fun RegistartionBody(){
                 )
 
             )
+
+            Spacer(modifier = Modifier .height(20.dp))
 
             OutlinedTextField(
                 value = password,
