@@ -115,10 +115,6 @@ fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
 
 
 
-
-
-
-
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     val userRepo = remember { UserRepoImpl() }
 
