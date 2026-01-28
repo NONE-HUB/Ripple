@@ -34,6 +34,7 @@ import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
 import com.example.ripple.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
+import java.io.File
 
 /* ---------- Design Tokens ---------- */
 private val GradientTop = Color(0xFFF3F6FB)
@@ -47,14 +48,11 @@ private val SkeletonHighlight = Color(0xFFF3F4F6)
 
 @Composable
 fun ProfileScreen(userViewModel: UserViewModel = viewModel()) {
-    val uiState by remember { derivedStateOf { userViewModel.uiState } } // Compose reactive state
+//    val uiState by remember { derivedStateOf { userViewModel.uiState } } // Compose reactive state
+    val uiState = userViewModel.uiState
     val context = LocalContext.current
 
-    val imagePicker = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        userViewModel.updatePhoto(uri)
-    }
+
 
     // Date picker
     val calendar = java.util.Calendar.getInstance()
@@ -67,6 +65,45 @@ fun ProfileScreen(userViewModel: UserViewModel = viewModel()) {
         calendar.get(java.util.Calendar.MONTH),
         calendar.get(java.util.Calendar.DAY_OF_MONTH)
     )
+
+    val savedPath = getSavedProfileImage(context)
+    LaunchedEffect(savedPath) {
+        if (savedPath != null) {
+            userViewModel.uiState = userViewModel.uiState.copy(
+                localPhotoPath = savedPath,
+                photoUri = Uri.fromFile(File(savedPath))
+            )
+        }
+    }
+
+
+
+    val imagePicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            val localPath = saveImageToLocalStorage(context, it)
+
+            // Update UI state immediately via ViewModel
+            userViewModel.setLocalPhoto(localPath)
+
+            // Upload to Firebase asynchronously
+            userViewModel.updatePhoto(it)
+        }
+    }
+
+
+
+
+    val imageModel: Any = when {
+        uiState.localPhotoPath != null && File(uiState.localPhotoPath!!).exists() ->
+            Uri.fromFile(File(uiState.localPhotoPath!!))
+        uiState.photoUri != null -> uiState.photoUri
+        uiState.photoUrl.isNotEmpty() -> uiState.photoUrl
+        else -> R.drawable.circle_regular_full
+    }
+
+
 
     // Reload user whenever screen opens
     LaunchedEffect(Unit) {
@@ -81,23 +118,36 @@ fun ProfileScreen(userViewModel: UserViewModel = viewModel()) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-        /* ---------- Profile Header ---------- */
-        Box(contentAlignment = Alignment.BottomEnd, modifier = Modifier.size(140.dp)) {
+        // Circular profile photo widget
+        Box(
+            contentAlignment = Alignment.BottomEnd,
+            modifier = Modifier.size(140.dp)
+
+        ) {
+            // Force reload by pairing with imageVersion
+            val imageModelWithVersion: Any = when {
+                uiState.localPhotoPath != null && File(uiState.localPhotoPath!!).exists() ->
+                    Uri.fromFile(File(uiState.localPhotoPath!!)).toString() + "?v=${uiState.imageVersion}"
+                uiState.photoUri != null ->
+                    uiState.photoUri.toString() + "?v=${uiState.imageVersion}"
+                uiState.photoUrl.isNotEmpty() ->
+                    uiState.photoUrl + "?v=${uiState.imageVersion}"
+                else -> R.drawable.circle_regular_full
+            }
+
+            val painter = rememberAsyncImagePainter(model = imageModelWithVersion)
 
             Image(
-                painter = rememberAsyncImagePainter(
-                    model = uiState.photoUri ?: uiState.photoUrl.ifEmpty { R.drawable.circle_regular_full }
-                ),
+                painter = painter,
                 contentDescription = "Profile Photo",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(140.dp)
                     .clip(CircleShape)
-                    .background(Color.LightGray)
-                    .border(2.dp, Color.Gray, CircleShape)
             )
 
-            // Add photo button
+
+            // Camera Icon
             IconButton(
                 onClick = { imagePicker.launch("image/*") },
                 modifier = Modifier
@@ -106,22 +156,42 @@ fun ProfileScreen(userViewModel: UserViewModel = viewModel()) {
                     .background(Color.White.copy(alpha = 0.9f))
                     .border(1.dp, Color.Gray, CircleShape)
             ) {
-                Icon(Icons.Default.AddAPhoto, contentDescription = "Add Photo", tint = Color.Black)
+                Icon(
+                    imageVector = Icons.Default.AddAPhoto,
+                    contentDescription = "Add Photo",
+                    tint = Color.Black
+                )
             }
 
-            // Remove photo button
-            if (uiState.photoUri != null || uiState.photoUrl.isNotEmpty()) {
+            // Remove photo icon
+            if (uiState.localPhotoPath != null || uiState.photoUri != null || uiState.photoUrl.isNotEmpty()) {
                 IconButton(
-                    onClick = { userViewModel.updatePhoto(null) },
+                    onClick = {
+                        // Delete local file if exists
+                        uiState.localPhotoPath?.let { File(it).delete() }
+                        // Clear UI state
+                        userViewModel.uiState = userViewModel.uiState.copy(
+                            photoUri = null,
+                            localPhotoPath = null,
+                            photoUrl = ""
+                        )
+                        clearSavedProfileImage(context) // remove from SharedPreferences
+                    },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .size(30.dp)
                         .clip(CircleShape)
                         .background(Color.White)
                 ) {
-                    Icon(Icons.Default.Delete, contentDescription = "Remove Photo", tint = Color.Red)
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Remove Photo",
+                        tint = Color.Red
+                    )
                 }
             }
+
+
         }
 
         Spacer(modifier = Modifier.height(16.dp))

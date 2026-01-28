@@ -1,5 +1,6 @@
 package com.example.ripple
 
+import UserModel
 import android.app.DatePickerDialog
 import android.net.Uri
 import android.widget.Toast
@@ -32,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
-import com.example.ripple.model.UserModel
 import com.example.ripple.repository.UserRepoImpl
 import com.example.ripple.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth

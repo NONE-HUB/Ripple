@@ -1,10 +1,11 @@
 package com.example.ripple.repository
 
-import com.example.ripple.model.UserModel
+import UserModel
 import com.example.ripple.viewmodel.ReportModel
 import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.*
+import java.util.UUID
 
 class UserRepoImpl : UserRepo {
 
@@ -219,7 +220,6 @@ class UserRepoImpl : UserRepo {
                 callback(it.isSuccessful, it.exception?.message ?: "Feedback sent")
             }
     }
-
 
 
 }

@@ -1,6 +1,8 @@
 package com.example.ripple
 
+import UserModel
 import android.app.DatePickerDialog
+import android.content.Context
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -44,7 +46,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
-import com.example.ripple.model.UserModel
 import com.example.ripple.repository.UserRepoImpl
 import com.example.ripple.viewmodel.ReportModel
 import com.example.ripple.viewmodel.UserUiState
@@ -54,6 +55,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import kotlinx.coroutines.launch
 import java.util.Calendar
+import java.io.File
 
 @Composable
 fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
@@ -72,13 +74,51 @@ fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
     val user = userViewModel.uiState // or fetched UserModel
 
 
-    val imagePicker = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        userViewModel.updatePhoto(uri)
+    val context = LocalContext.current
+
+    val savedPath = getSavedProfileImage(context)
+    LaunchedEffect(savedPath) {
+        if (savedPath != null) {
+            userViewModel.uiState = userViewModel.uiState.copy(
+                localPhotoPath = savedPath,
+                photoUri = Uri.fromFile(File(savedPath))
+            )
+        }
     }
 
-    val context = LocalContext.current
+
+
+    val imagePicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            val localPath = saveImageToLocalStorage(context, it)
+
+            // Update UI state immediately via ViewModel
+            userViewModel.setLocalPhoto(localPath)
+
+            // Upload to Firebase asynchronously
+            userViewModel.updatePhoto(it)
+        }
+    }
+
+
+
+
+    val imageModel: Any = when {
+        uiState.localPhotoPath != null && File(uiState.localPhotoPath!!).exists() ->
+            Uri.fromFile(File(uiState.localPhotoPath!!))
+        uiState.photoUri != null -> uiState.photoUri
+        uiState.photoUrl.isNotEmpty() -> uiState.photoUrl
+        else -> R.drawable.circle_regular_full
+    }
+
+
+
+
+
+
+
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     val userRepo = remember { UserRepoImpl() }
 
@@ -89,6 +129,7 @@ fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
     var feedbackReportId by remember { mutableStateOf<String?>(null) }  // for feedback dialog
     var feedbackText by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
+
 
     Column(
         modifier = Modifier
@@ -117,21 +158,29 @@ fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
                 Box(
                     contentAlignment = Alignment.BottomEnd,
                     modifier = Modifier.size(140.dp)
+
                 ) {
+                    // Force reload by pairing with imageVersion
+                    val imageModelWithVersion: Any = when {
+                        uiState.localPhotoPath != null && File(uiState.localPhotoPath!!).exists() ->
+                            Uri.fromFile(File(uiState.localPhotoPath!!)).toString() + "?v=${uiState.imageVersion}"
+                        uiState.photoUri != null ->
+                            uiState.photoUri.toString() + "?v=${uiState.imageVersion}"
+                        uiState.photoUrl.isNotEmpty() ->
+                            uiState.photoUrl + "?v=${uiState.imageVersion}"
+                        else -> R.drawable.circle_regular_full
+                    }
+
+                    val painter = rememberAsyncImagePainter(model = imageModelWithVersion)
 
                     Image(
-                        painter = rememberAsyncImagePainter(
-                            model = uiState.photoUri ?: uiState.photoUrl.ifEmpty { R.drawable.circle_regular_full }
-                        ),
+                        painter = painter,
                         contentDescription = "Profile Photo",
                         contentScale = ContentScale.Crop,
                         modifier = Modifier
                             .size(140.dp)
                             .clip(CircleShape)
-                            .background(Color.LightGray)
-                            .border(2.dp, Color.Gray, CircleShape)
                     )
-
 
 
                     // Camera Icon
@@ -151,9 +200,19 @@ fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
                     }
 
                     // Remove photo icon
-                    if (uiState.photoUri != null || uiState.photoUrl.isNotEmpty()) {
+                    if (uiState.localPhotoPath != null || uiState.photoUri != null || uiState.photoUrl.isNotEmpty()) {
                         IconButton(
-                            onClick = { userViewModel.updatePhoto(null) }, // <- pass null to remove photo
+                            onClick = {
+                                // Delete local file if exists
+                                uiState.localPhotoPath?.let { File(it).delete() }
+                                // Clear UI state
+                                userViewModel.uiState = userViewModel.uiState.copy(
+                                    photoUri = null,
+                                    localPhotoPath = null,
+                                    photoUrl = ""
+                                )
+                                clearSavedProfileImage(context) // remove from SharedPreferences
+                            },
                             modifier = Modifier
                                 .align(Alignment.TopEnd)
                                 .size(30.dp)
@@ -167,6 +226,7 @@ fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
                             )
                         }
                     }
+
 
                 }
 
@@ -615,6 +675,7 @@ fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
 
 }
 
+
 @Composable
 fun ExpandableSection(title: String, content: @Composable ColumnScope.() -> Unit) {
     var expanded by remember { mutableStateOf(true) }
@@ -1006,14 +1067,8 @@ fun EditProfileContent(
     onClose: () -> Unit
 ) {
     val uiState = userViewModel.uiState
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
 
-    val imagePicker = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        userViewModel.updatePhoto(uri)
-    }
+    val scope = rememberCoroutineScope()
 
     val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     val userRepo = remember { UserRepoImpl() }
@@ -1027,6 +1082,45 @@ fun EditProfileContent(
 
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    val context = LocalContext.current
+
+    val savedPath = getSavedProfileImage(context)
+    LaunchedEffect(savedPath) {
+        if (savedPath != null) {
+            userViewModel.uiState = userViewModel.uiState.copy(
+                localPhotoPath = savedPath,
+                photoUri = Uri.fromFile(File(savedPath))
+            )
+        }
+    }
+
+
+
+    val imagePicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            val localPath = saveImageToLocalStorage(context, it)
+
+            // Update UI state immediately via ViewModel
+            userViewModel.setLocalPhoto(localPath)
+
+            // Upload to Firebase asynchronously
+            userViewModel.updatePhoto(it)
+        }
+    }
+
+
+
+
+    val imageModel: Any = when {
+        uiState.localPhotoPath != null && File(uiState.localPhotoPath!!).exists() ->
+            Uri.fromFile(File(uiState.localPhotoPath!!))
+        uiState.photoUri != null -> uiState.photoUri
+        uiState.photoUrl.isNotEmpty() -> uiState.photoUrl
+        else -> R.drawable.circle_regular_full
+    }
 
     // ---------- Load User Data ----------
     LaunchedEffect(userId) {
@@ -1072,25 +1166,33 @@ fun EditProfileContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // ---------- Profile Photo ----------
+        // Circular profile photo widget
         Box(
             contentAlignment = Alignment.BottomEnd,
             modifier = Modifier.size(140.dp)
+
         ) {
+            // Force reload by pairing with imageVersion
+            val imageModelWithVersion: Any = when {
+                uiState.localPhotoPath != null && File(uiState.localPhotoPath!!).exists() ->
+                    Uri.fromFile(File(uiState.localPhotoPath!!)).toString() + "?v=${uiState.imageVersion}"
+                uiState.photoUri != null ->
+                    uiState.photoUri.toString() + "?v=${uiState.imageVersion}"
+                uiState.photoUrl.isNotEmpty() ->
+                    uiState.photoUrl + "?v=${uiState.imageVersion}"
+                else -> R.drawable.circle_regular_full
+            }
+
+            val painter = rememberAsyncImagePainter(model = imageModelWithVersion)
 
             Image(
-                painter = rememberAsyncImagePainter(
-                    model = uiState.photoUri ?: uiState.photoUrl.ifEmpty { R.drawable.circle_regular_full }
-                ),
+                painter = painter,
                 contentDescription = "Profile Photo",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .size(140.dp)
                     .clip(CircleShape)
-                    .background(Color.LightGray)
-                    .border(2.dp, Color.Gray, CircleShape)
             )
-
 
 
             // Camera Icon
@@ -1110,9 +1212,19 @@ fun EditProfileContent(
             }
 
             // Remove photo icon
-            if (uiState.photoUri != null || uiState.photoUrl.isNotEmpty()) {
+            if (uiState.localPhotoPath != null || uiState.photoUri != null || uiState.photoUrl.isNotEmpty()) {
                 IconButton(
-                    onClick = { userViewModel.updatePhoto(null) }, // <- pass null to remove photo
+                    onClick = {
+                        // Delete local file if exists
+                        uiState.localPhotoPath?.let { File(it).delete() }
+                        // Clear UI state
+                        userViewModel.uiState = userViewModel.uiState.copy(
+                            photoUri = null,
+                            localPhotoPath = null,
+                            photoUrl = ""
+                        )
+                        clearSavedProfileImage(context) // remove from SharedPreferences
+                    },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .size(30.dp)
@@ -1126,6 +1238,7 @@ fun EditProfileContent(
                     )
                 }
             }
+
 
         }
 
@@ -1265,6 +1378,119 @@ fun EditProfileDialog(
         }
     }
 }
+
+@Composable
+fun ProfileImage(userViewModel: UserViewModel) {
+    val context = LocalContext.current
+
+    // Load saved path on start
+    LaunchedEffect(Unit) {
+        getSavedProfileImage(context)?.let {
+            userViewModel.setLocalPhoto(it)
+        }
+    }
+
+    val uiState = userViewModel.uiState
+
+    // Decide which image to show
+    val imageModel: Any = when {
+        uiState.localPhotoPath != null && File(uiState.localPhotoPath!!).exists() ->
+            Uri.fromFile(File(uiState.localPhotoPath!!))
+        uiState.photoUri != null -> uiState.photoUri
+        uiState.photoUrl.isNotEmpty() -> uiState.photoUrl
+        else -> R.drawable.circle_regular_full
+    }
+
+    // Image picker
+    val imagePicker = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            val localPath = saveImageToLocalStorage(context, it)
+            userViewModel.setLocalPhoto(localPath)
+            userViewModel.updatePhoto(it) // upload to Firebase if needed
+        }
+    }
+
+    Box(
+        contentAlignment = Alignment.BottomEnd,
+        modifier = Modifier.size(140.dp)
+    ) {
+        Image(
+            painter = rememberAsyncImagePainter(model = imageModel),
+            contentDescription = "Profile Photo",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier
+                .size(140.dp)
+                .clip(CircleShape)
+        )
+
+        // Camera Icon
+        IconButton(
+            onClick = { imagePicker.launch("image/*") },
+            modifier = Modifier
+                .size(40.dp)
+                .clip(CircleShape)
+                .background(Color.White.copy(alpha = 0.9f))
+                .border(1.dp, Color.Gray, CircleShape)
+        ) {
+            Icon(
+                imageVector = Icons.Default.AddAPhoto,
+                contentDescription = "Add Photo",
+                tint = Color.Black
+            )
+        }
+
+        // Remove Icon
+        if (uiState.localPhotoPath != null || uiState.photoUri != null || uiState.photoUrl.isNotEmpty()) {
+            IconButton(
+                onClick = { userViewModel.clearPhoto(context) },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .size(30.dp)
+                    .clip(CircleShape)
+                    .background(Color.White)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = "Remove Photo",
+                    tint = Color.Red
+                )
+            }
+        }
+    }
+}
+
+
+fun saveImageToLocalStorage(context: Context, uri: Uri): String {
+    val file = File(context.filesDir, "profile.jpg")
+    context.contentResolver.openInputStream(uri)?.use { input ->
+        file.outputStream().use { output ->
+            input.copyTo(output)
+        }
+    }
+
+    context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+        .edit()
+        .putString("profile_image_path", file.absolutePath)
+        .apply()
+
+    return file.absolutePath
+}
+
+fun getSavedProfileImage(context: Context): String? =
+    context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+        .getString("profile_image_path", null)
+
+fun clearSavedProfileImage(context: Context) {
+    context.getSharedPreferences("prefs", Context.MODE_PRIVATE)
+        .edit()
+        .remove("profile_image_path")
+        .apply()
+}
+
+
+
 
 
 

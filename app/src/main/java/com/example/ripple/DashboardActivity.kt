@@ -40,7 +40,7 @@ import com.example.ripple.viewmodel.UserViewModel
 
 
 import com.example.ripple.ui.theme.RippleTheme
-import com.example.ripple.viewmodel.SocialViewModel
+
 
 class DashboardActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,7 +59,7 @@ fun DashboardBody() {
 
     val context = LocalContext.current
     val activity = context as? Activity
-    val socialViewModel: SocialViewModel = viewModel() // gets the ViewModel
+
 
 
 
@@ -67,6 +67,9 @@ fun DashboardBody() {
     val password = activity?.intent?.getStringExtra("password") ?: ""
 
     val navBarHeight = 110.dp
+
+    val userViewModel: UserViewModel = viewModel()
+
 
     data class NavItem(val label: String, val icon: Int, val iconsize: Dp = 25.dp)
 
@@ -159,12 +162,12 @@ fun DashboardBody() {
                 .padding(padding)
         ){
             when(selectedItem){
-                0 -> HomeScreen(viewModel = socialViewModel)
+                0 -> HomeScreen(userViewModel)
                 1 -> CreateScreen()
                 2 -> ProfileScreen()
                 3 -> NotificationScreen()
                 4 -> SettingScreen()
-                else -> HomeScreen(viewModel = socialViewModel)
+                else -> HomeScreen(userViewModel)
             }
         }
     }
