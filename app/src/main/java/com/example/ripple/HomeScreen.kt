@@ -36,6 +36,12 @@ import com.example.ripple.viewmodel.UserViewModel
 import com.google.firebase.auth.FirebaseAuth
 import java.io.File
 import java.util.*
+import androidx.compose.material.icons.filled.AddAPhoto
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.ArrowDownward
+
 
 @Composable
 fun HomeScreen(userViewModel: UserViewModel) {
@@ -76,19 +82,36 @@ fun HomeScreen(userViewModel: UserViewModel) {
                 PostCard(
                     post = post,
                     isOwner = post.userId == userId,
-                    onEdit = {
-                        editingPost = it
-                        description = it.description
+                    onEdit = { editedPost ->
+                        // open dialog for editing
+                        editingPost = editedPost
+                        description = editedPost.description
+                        selectedImageUri = null
                         showDialog = true
                     },
-                    onDelete = {
-                        postRepo.deletePost(it.postId) { success, _ ->
+                    onDelete = { deletedPost ->
+                        // delete post
+                        postRepo.deletePost(deletedPost.postId) { success, _ ->
                             if (success) {
-                                posts = posts.filterNot { p -> p.postId == it.postId }
+                                posts = posts.filterNot { it.postId == deletedPost.postId }
+                            }
+                        }
+                    },
+                    onVote = { votedPost, isUpvote ->
+                        val updated = if (isUpvote) {
+                            votedPost.copy(upvotes = votedPost.upvotes + 1)
+                        } else {
+                            votedPost.copy(downvotes = votedPost.downvotes + 1)
+                        }
+
+                        postRepo.updatePost(updated) { success, _ ->
+                            if (success) {
+                                posts = posts.map { if (it.postId == updated.postId) updated else it }
                             }
                         }
                     }
                 )
+
             }
         }
 
@@ -228,7 +251,8 @@ fun PostCard(
     post: Posted,
     isOwner: Boolean,
     onEdit: (Posted) -> Unit,
-    onDelete: (Posted) -> Unit
+    onDelete: (Posted) -> Unit,
+    onVote: (Posted, Boolean) -> Unit // true = upvote, false = downvote
 ) {
     val actionSize = 36.dp
 
@@ -487,10 +511,33 @@ fun PostCard(
                     }
                 }
             }
+
+            // Votes row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Start
+            ) {
+                IconButton(onClick = {
+                    // Increment upvotes
+                    onVote(post, true)
+                }) {
+                    Icon(Icons.Default.ArrowUpward, contentDescription = "Upvote", tint = Color.Green)
+                }
+                Text("${post.upvotes}", color = Color.White)
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                IconButton(onClick = {
+                    // Increment downvotes
+                    onVote(post, false)
+                }) {
+                    Icon(Icons.Default.ArrowDownward, contentDescription = "Downvote", tint = Color.Red)
+                }
+                Text("${post.downvotes}", color = Color.White)
+            }
+
         }
-
-
-
     }
 }
 

@@ -13,5 +13,6 @@ data class Posted(
     val userPhotoUrl: String = "",
 
     val timestamp: Long = System.currentTimeMillis(),
-
+    val upvotes: Int = 0,
+    val downvotes: Int = 0
 )
