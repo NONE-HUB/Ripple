@@ -26,6 +26,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.Icon
@@ -57,6 +58,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ripple.ui.theme.PurpleGrey80
+import com.google.firebase.auth.FirebaseAuth
+
 // Firebase imports
 
 class LoginActivity : ComponentActivity() {
@@ -130,6 +133,32 @@ fun ProfileActivity(){
 
             Spacer(modifier = Modifier .height(60.dp))
 
+//            OutlinedTextField(
+//                value = email,
+//                onValueChange = { data ->
+//                    email = data
+//                },
+//                leadingIcon = {Icon(painter = painterResource(R.drawable.messagebox), contentDescription = null,
+//                    modifier = Modifier
+//                        .size(25.dp))},
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(horizontal = 15.dp),
+//                shape = RoundedCornerShape(15.dp),
+//                placeholder = {
+//                    Text("Username or email")
+//                },
+//                keyboardOptions = KeyboardOptions(
+//                    keyboardType = KeyboardType.Email
+//                ),
+//                colors = TextFieldDefaults.colors(
+//                    focusedContainerColor = PurpleGrey80,
+//                    unfocusedContainerColor = PurpleGrey80,
+//                    focusedIndicatorColor = Color.Blue,
+//                    unfocusedIndicatorColor = Color.Transparent
+//                )
+//            )
+
             OutlinedTextField(
                 value = email,
                 onValueChange = { data ->
@@ -143,7 +172,7 @@ fun ProfileActivity(){
                     .padding(horizontal = 15.dp),
                 shape = RoundedCornerShape(15.dp),
                 placeholder = {
-                    Text("Username or email")
+                    Text("abc@gmail.com")
                 },
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email
@@ -154,14 +183,56 @@ fun ProfileActivity(){
                     focusedIndicatorColor = Color.Blue,
                     unfocusedIndicatorColor = Color.Transparent
                 )
+
             )
 
             Spacer(modifier = Modifier .height(20.dp))
 
+//            OutlinedTextField(
+//                value = password,
+//                onValueChange = {
+//                    password = it
+//                },
+//                leadingIcon = {Icon(painter = painterResource(R.drawable.locker), contentDescription = null,
+//                    modifier = Modifier
+//                        .size(25.dp))},
+//                trailingIcon = {
+//                    IconButton(onClick = {
+//                        visibility = !visibility
+//                    }) {
+//                        Icon(
+//                            painter = if (visibility)
+//                                painterResource(R.drawable.eye_open)
+//                            else
+//                                painterResource(R.drawable.eye_close),
+//                            contentDescription = null,
+//                            modifier = Modifier
+//                                .size(30.dp)
+//                        )
+//                    }
+//                },
+//                visualTransformation = if (visibility) VisualTransformation.None else PasswordVisualTransformation(),
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(horizontal = 15.dp),
+//                shape = RoundedCornerShape(15.dp),
+//                placeholder = {
+//                    Text("*********")
+//                },
+//
+//                colors = TextFieldDefaults.colors(
+//                    focusedContainerColor = PurpleGrey80,
+//                    unfocusedContainerColor = PurpleGrey80,
+//                    focusedIndicatorColor = Color.Blue,
+//                    unfocusedIndicatorColor = Color.Transparent
+//                )
+//
+//            )
+
             OutlinedTextField(
                 value = password,
-                onValueChange = {
-                    password = it
+                onValueChange = { data ->
+                    password = data
                 },
                 leadingIcon = {Icon(painter = painterResource(R.drawable.locker), contentDescription = null,
                     modifier = Modifier
@@ -175,9 +246,7 @@ fun ProfileActivity(){
                                 painterResource(R.drawable.eye_open)
                             else
                                 painterResource(R.drawable.eye_close),
-                            contentDescription = null,
-                            modifier = Modifier
-                                .size(30.dp)
+                            contentDescription = null
                         )
                     }
                 },
@@ -217,38 +286,77 @@ fun ProfileActivity(){
                 Text("I agree to terms & conditions")
             }
 
+//            Button(
+//                onClick = {
+//
+//                    val sharedPreferences = context.getSharedPreferences("User", Context.MODE_PRIVATE)
+//                    val savedEmail = sharedPreferences.getString("email", "") ?: ""
+//                    val savedUsername = sharedPreferences.getString("username", "") ?: ""
+//                    val savedPassword = sharedPreferences.getString("password", "") ?: ""
+//
+//                    if (email.isEmpty() ||  password.isEmpty()) {
+//                        Toast.makeText(context, "Please enter username/email and password", Toast.LENGTH_SHORT).show()
+//                        return@Button
+//                    }
+//
+//                    // Check if input matches either email or username, AND password matches
+//                    val isValid = (email == savedEmail || email == savedUsername) && password == savedPassword
+//
+//                    if (isValid) {
+//                        // Save current logged-in user
+//                        sharedPreferences.edit().putString("currentUser", email).apply()
+//
+//                        val intent = Intent(context, DashboardActivity::class.java)
+//                        context.startActivity(intent)
+//                        activity.finish()
+//                    } else {
+//                        Toast.makeText(context, "Invalid login details", Toast.LENGTH_SHORT).show()
+//                    }
+//
+//                },
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(horizontal = 15.dp)
+//                    .height(60.dp),
+//                shape = RoundedCornerShape(10.dp)
+//            ) {
+//                Text("Log In")
+//            }
+
             Button(
                 onClick = {
-
-                    val sharedPreferences = context.getSharedPreferences("User", Context.MODE_PRIVATE)
-                    val savedEmail = sharedPreferences.getString("email", "") ?: ""
-                    val savedUsername = sharedPreferences.getString("username", "") ?: ""
-                    val savedPassword = sharedPreferences.getString("password", "") ?: ""
-
-                    if (email.isEmpty() ||  password.isEmpty()) {
-                        Toast.makeText(context, "Please enter username/email and password", Toast.LENGTH_SHORT).show()
+                    // Empty check
+                    if (email.isEmpty() || password.isEmpty()) {
+                        Toast.makeText(
+                            context,
+                            "Please enter email and password",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         return@Button
                     }
 
-                    // Check if input matches either email or username, AND password matches
-                    val isValid = (email == savedEmail || email == savedUsername) && password == savedPassword
-
-                    if (isValid) {
-                        // Save current logged-in user
-                        sharedPreferences.edit().putString("currentUser", email).apply()
-
-                        val intent = Intent(context, DashboardActivity::class.java)
-                        context.startActivity(intent)
-                        activity.finish()
-                    } else {
-                        Toast.makeText(context, "Invalid login details", Toast.LENGTH_SHORT).show()
-                    }
+                    // Login using Firebase
+                    FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                val intent = Intent(context, DashboardActivity::class.java)
+                                context.startActivity(intent)
+                                activity.finish()
+                            } else {
+                                Toast.makeText(
+                                    context,
+                                    task.exception?.message ?: "Login failed",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
 
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 15.dp)
                     .height(60.dp),
+                elevation = ButtonDefaults.buttonElevation(defaultElevation = 15.dp),
                 shape = RoundedCornerShape(10.dp)
             ) {
                 Text("Log In")
