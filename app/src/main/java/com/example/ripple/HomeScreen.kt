@@ -157,9 +157,9 @@ fun HomeScreen(userViewModel: UserViewModel) {
 
                         postRepo.updatePost(updated) { success, _ ->
                             if (success){
-                            posts = posts.map {
-                                if (it.postId == updated.postId) updated else it
-                            }
+                                posts = posts.map {
+                                    if (it.postId == updated.postId) updated else it
+                                }
                             }
                         }
                     } else {
@@ -540,5 +540,3 @@ fun PostCard(
         }
     }
 }
-
-
