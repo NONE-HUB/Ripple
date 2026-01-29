@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -39,6 +40,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Blue
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -46,6 +48,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -53,8 +56,15 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.ripple.viewmodel.UserViewModel
+import UserModel
+import com.example.ripple.repository.UserRepoImpl
 import com.example.ripple.ui.theme.PurpleGrey80
 import com.example.ripple.ui.theme.RippleTheme
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.database.FirebaseDatabase
+
 
 class RegistrationActivityNew : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,13 +79,26 @@ class RegistrationActivityNew : ComponentActivity() {
 @Composable
 fun RegistrationNewBody(){
 
+    val userViewModel = remember { UserViewModel(UserRepoImpl()) }
+
+    var userId by remember { mutableStateOf("") }
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    var gender by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var visibility by remember { mutableStateOf(false) }
+    var terms by remember { mutableStateOf(false) }
+
+//    val currentUser = FirebaseAuth.getInstance().currentUser
+
+//    var email by remember { mutableStateOf("") }
+//    var password by remember { mutableStateOf("") }
+//    var visibility by remember { mutableStateOf(false) }
 
     val context = LocalContext.current
     var showDialog by remember { mutableStateOf(false) }
-    var terms by remember { mutableStateOf(false) }
+//    var terms by remember { mutableStateOf(false) }
 
     val activity = context as Activity
 
@@ -136,11 +159,35 @@ fun RegistrationNewBody(){
 
             Spacer(modifier = Modifier .height(10.dp))
 
-            CharacterNew(
+//            CharacterNew(
+//                value = email,
+//                onValueChange = { email = it },
+//                label = "Username",
+//                modifier = Modifier
+//            )
+
+            OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
-                label = "Username",
+                onValueChange = { data ->
+                    email = data
+                },
                 modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp),
+                shape = RoundedCornerShape(15.dp),
+                placeholder = {
+                    Text("abc@gmail.com")
+                },
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Email
+                ),
+                colors = TextFieldDefaults.colors(
+                    focusedContainerColor = PurpleGrey80,
+                    unfocusedContainerColor = PurpleGrey80,
+                    focusedIndicatorColor = Blue,
+                    unfocusedIndicatorColor = Color.Transparent
+                )
+
             )
 
             Spacer(modifier = Modifier .height(20.dp))
@@ -165,9 +212,9 @@ fun RegistrationNewBody(){
                     }) {
                         Icon(
                             painter = if (visibility)
-                                painterResource(R.drawable.eye_open)
+                                painterResource(R.drawable.eye_close)
                             else
-                                painterResource(R.drawable.eye_close),
+                                painterResource(R.drawable.eye_open),
                             contentDescription = null
                         )
                     }
@@ -184,11 +231,47 @@ fun RegistrationNewBody(){
                 colors = TextFieldDefaults.colors(
                     focusedContainerColor = PurpleGrey80,
                     unfocusedContainerColor = PurpleGrey80,
-                    focusedIndicatorColor = Color.Blue,
+                    focusedIndicatorColor = Blue,
                     unfocusedIndicatorColor = Color.Transparent
                 )
 
             )
+
+//            OutlinedTextField(
+//                value = password,
+//                onValueChange = {
+//                    password = it
+//                },
+//                trailingIcon = {
+//                    IconButton(onClick = {
+//                        visibility = !visibility
+//                    }) {
+//                        Icon(
+//                            painter = if (visibility)
+//                                painterResource(R.drawable.eye_open)
+//                            else
+//                                painterResource(R.drawable.eye_close),
+//                            contentDescription = null
+//                        )
+//                    }
+//                },
+//                visualTransformation = if (visibility) VisualTransformation.None else PasswordVisualTransformation(),
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(horizontal = 15.dp),
+//                shape = RoundedCornerShape(15.dp),
+//                placeholder = {
+//                    Text("*********")
+//                },
+//
+//                colors = TextFieldDefaults.colors(
+//                    focusedContainerColor = PurpleGrey80,
+//                    unfocusedContainerColor = PurpleGrey80,
+//                    focusedIndicatorColor = Color.Blue,
+//                    unfocusedIndicatorColor = Color.Transparent
+//                )
+//
+//            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -205,6 +288,81 @@ fun RegistrationNewBody(){
                     )
                 )
                 Text("I agree to terms & conditions")
+            }
+
+            Button(
+                onClick = {
+                    if (!terms) {
+                        Toast.makeText(
+                            context,
+                            "please agree to terms &  conditions",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }else{
+                        userViewModel.register(email,password){
+                                success,message,userId->
+                            if(success){
+                                var model = UserModel(
+                                    email = email,
+                                    password = password
+                                )
+                                userViewModel.addUserToDatabase(
+                                    userId,model
+                                ){
+                                        success,message->
+                                    if(success){
+                                        Toast.makeText(
+                                            context,
+                                            message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+
+                                        // Navigate to LoginActivity
+                                        val intent = Intent(context, LoginActivity::class.java)
+                                        context.startActivity(intent)
+                                        activity.finish() // Close RegistrationActivity
+
+                                    }else{
+                                        Toast.makeText(
+                                            context,
+                                            message,
+                                            Toast.LENGTH_SHORT
+                                        ).show()
+                                    }
+                                }
+                            }else{
+                                Toast.makeText(
+                                    context,
+                                    message,
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+                        }
+
+//                        editor.putString("email",email)
+//                        editor.putString("password",password)
+//                        editor.putString("date",selectedDate)
+//
+//                        editor.apply()
+//                        Toast.makeText(
+//                            context,
+//                            "Success",
+//                            Toast.LENGTH_SHORT
+//                        ).show()
+//                        activity.finish()
+
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 15.dp)
+                    .height(60.dp),
+                elevation = ButtonDefaults.buttonElevation(
+                    defaultElevation = 15.dp
+                ),
+                shape = RoundedCornerShape(10.dp)
+            ) {
+                Text("Sign Up")
             }
 
             Button(
@@ -257,8 +415,73 @@ fun RegistrationNewBody(){
                 Text("Sign Up")
             }
 
-
-
+//            Button(
+//                onClick = {
+//                    if (!terms) {
+//                        Toast.makeText(
+//                            context,
+//                            "please agree to terms & conditions",
+//                            Toast.LENGTH_SHORT
+//                        ).show()
+//                        return@Button
+//                    }
+//
+//                    val auth = FirebaseAuth.getInstance()
+//                    val currentUser = auth.currentUser
+//
+//                    if (currentUser == null) {
+//                        Toast.makeText(
+//                            context,
+//                            "Session expired. Please restart registration.",
+//                            Toast.LENGTH_SHORT
+//                        ).show()
+//                        return@Button
+//                    }
+//
+//                    val credential =
+//                        EmailAuthProvider.getCredential(email, password)
+//
+//                    currentUser
+//                        .linkWithCredential(credential)
+//                        .addOnSuccessListener {
+//
+//                            // Save email ONLY (never password)
+//                            FirebaseDatabase.getInstance().reference
+//                                .child("users")
+//                                .child(currentUser.uid)
+//                                .child("email")
+//                                .setValue(email)
+//
+//                            Toast.makeText(
+//                                context,
+//                                "Registration completed",
+//                                Toast.LENGTH_SHORT
+//                            ).show()
+//
+//                            context.startActivity(
+//                                Intent(context, LoginActivity::class.java)
+//                            )
+//                            activity.finish()
+//                        }
+//                        .addOnFailureListener {
+//                            Toast.makeText(
+//                                context,
+//                                it.message,
+//                                Toast.LENGTH_SHORT
+//                            ).show()
+//                        }
+//                },
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .padding(horizontal = 15.dp)
+//                    .height(60.dp),
+//                elevation = ButtonDefaults.buttonElevation(
+//                    defaultElevation = 15.dp
+//                ),
+//                shape = RoundedCornerShape(10.dp)
+//            ) {
+//                Text("Create Account")
+//            }
 
 
             Text(buildAnnotatedString {
