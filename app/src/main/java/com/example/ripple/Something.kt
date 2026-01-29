@@ -1208,6 +1208,20 @@ fun Greeting() {
 
     Spacer(modifier = Modifier .height(10.dp))
 
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    
 
     Row(
         modifier = Modifier
