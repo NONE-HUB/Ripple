@@ -12,5 +12,6 @@ data class Posted(
     val userName: String = "",
     val userPhotoUrl: String = "",
 
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+
 )

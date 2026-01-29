@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
+import com.example.ripple.model.Comment
 import com.example.ripple.model.Posted
 import com.example.ripple.repository.PostRepoImpl
 import com.example.ripple.viewmodel.UserViewModel
@@ -150,7 +151,8 @@ fun HomeScreen(userViewModel: UserViewModel) {
 
                         postRepo.addPost(newPost) { success, _ ->
                             if (success) {
-                                posts = posts + newPost
+                                // reload from DB
+                                postRepo.getAllPosts { posts = it }
                             }
                         }
                     }
@@ -229,6 +231,12 @@ fun PostCard(
     onDelete: (Posted) -> Unit
 ) {
     val actionSize = 36.dp
+
+    // Comments state for this post
+    var comments by remember { mutableStateOf<List<Comment>>(emptyList()) }
+    var showCommentInput by remember { mutableStateOf(false) }
+    var newCommentText by remember { mutableStateOf("") }
+
 
     Column(
         modifier = Modifier
@@ -379,6 +387,110 @@ fun PostCard(
                 )
             }
         }
+        Spacer(modifier = Modifier.height(8.dp))
+
+// Comments toggle
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
+        ) {
+            Text(
+                text = "💬 ${comments.size} Comments",
+                color = Color.Gray,
+                modifier = Modifier.clickable { showCommentInput = !showCommentInput }
+            )
+        }
+
+// Input for new comment
+        if (showCommentInput) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                OutlinedTextField(
+                    value = newCommentText,
+                    onValueChange = { newCommentText = it },
+                    label = { Text("Write a comment...") },
+                    modifier = Modifier.weight(1f)
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Button(onClick = {
+                    if (newCommentText.isNotBlank()) {
+                        comments = comments + Comment(
+                            userId = FirebaseAuth.getInstance().currentUser?.uid ?: "",
+                            username = userViewModel.uiState.username,
+                            text = newCommentText
+                        )
+                        newCommentText = ""
+                    }
+                }) {
+                    Text("Post")
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+// Show comments
+        Column(modifier = Modifier.fillMaxWidth()) {
+            comments.forEachIndexed { index, comment ->
+                var isEditing by remember { mutableStateOf(false) }
+                var editText by remember { mutableStateOf(comment.text) }
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 2.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End // Align comment to the right
+                ) {
+                    if (isEditing) {
+                        OutlinedTextField(
+                            value = editText,
+                            onValueChange = { editText = it },
+                            modifier = Modifier.weight(1f),
+                            singleLine = true
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Button(onClick = {
+                            // Update comment
+                            comments = comments.toMutableList().also { it[index] = comment.copy(text = editText) }
+                            isEditing = false
+                        }) {
+                            Text("Save")
+                        }
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Button(onClick = {
+                            isEditing = false
+                            editText = comment.text
+                        }) {
+                            Text("Cancel")
+                        }
+                    } else {
+                        Text("${comment.username}: ", color = Color.Cyan, fontSize = 14.sp)
+                        Text(comment.text, color = Color.White, fontSize = 14.sp)
+
+                        Spacer(modifier = Modifier.width(8.dp))
+
+                        // Edit button
+                        IconButton(onClick = { isEditing = true }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Edit Comment", tint = Color.Yellow)
+                        }
+
+                        // Delete button
+                        IconButton(onClick = {
+                            comments = comments.toMutableList().also { it.removeAt(index) }
+                        }) {
+                            Icon(Icons.Default.Delete, contentDescription = "Delete Comment", tint = Color.Red)
+                        }
+                    }
+                }
+            }
+        }
+
+
+
     }
 }
 

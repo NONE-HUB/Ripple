@@ -13,5 +13,8 @@ interface PostRepo {
     fun getAllPosts(
         callback: (List<Posted>) -> Unit
     )
+
+
+
 }
 
