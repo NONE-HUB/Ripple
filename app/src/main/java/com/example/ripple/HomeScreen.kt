@@ -2,7 +2,6 @@ package com.example.ripple
 
 import android.graphics.BitmapFactory
 import android.net.Uri
-import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -17,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -31,59 +31,67 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.ripple.model.Posted
 import com.example.ripple.repository.PostRepoImpl
-import com.example.ripple.viewmodel.UserUiState
 import com.example.ripple.viewmodel.UserViewModel
+import com.google.firebase.auth.FirebaseAuth
 import java.io.File
 import java.util.*
 
 @Composable
 fun HomeScreen(userViewModel: UserViewModel) {
+
     val context = LocalContext.current
-    val postRepo = PostRepoImpl()
-    val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: ""
+    val postRepo = remember { PostRepoImpl() }
+    val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
 
+    var posts by remember { mutableStateOf<List<Posted>>(emptyList()) }
     var showDialog by remember { mutableStateOf(false) }
-    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
-    var description by remember { mutableStateOf("") }
-    var posts by remember { mutableStateOf(listOf<Posted>()) }
-    var showSuccess by remember { mutableStateOf(false) }
+    var editingPost by remember { mutableStateOf<Posted?>(null) }
 
-    // Load all posts from Firebase on start
+    var description by remember { mutableStateOf("") }
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    // Load posts
     LaunchedEffect(Unit) {
-        postRepo.getAllPosts { data ->
-            posts = data
-        }
+        postRepo.getAllPosts { posts = it }
     }
 
-
-    // Image picker launcher
-    val imagePicker: ManagedActivityResultLauncher<String, Uri?> =
-        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            selectedImageUri = uri
+    val imagePicker =
+        rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) {
+            selectedImageUri = it
         }
+
+    val actionSize = 36.dp
+
 
     Box(modifier = Modifier.fillMaxSize()) {
 
-        // Posts list
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(posts.reversed()) { post ->
-                PostCardWithProfile(
-                    userViewModel = userViewModel,
-                    uiState = UserUiState(
-                        photoUrl = post.userPhotoUrl ?: "",
-                        photoUri = null,
-                        username = post.userName ?: ""
-                    ),
-                    description = post.description,
-                    imagePath = post.imageLocalPath
+                PostCard(
+                    post = post,
+                    isOwner = post.userId == userId,
+                    onEdit = {
+                        editingPost = it
+                        description = it.description
+                        showDialog = true
+                    },
+                    onDelete = {
+                        postRepo.deletePost(it.postId) { success, _ ->
+                            if (success) {
+                                posts = posts.filterNot { p -> p.postId == it.postId }
+                            }
+                        }
+                    }
                 )
             }
         }
 
-        // Floating add button
+        // Add post button
         Icon(
             painter = rememberAsyncImagePainter(R.drawable.create),
             contentDescription = "Add Post",
@@ -91,55 +99,73 @@ fun HomeScreen(userViewModel: UserViewModel) {
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
                 .size(56.dp)
-                .clickable { showDialog = true }
+                .clickable {
+                    editingPost = null
+                    description = ""
+                    selectedImageUri = null
+                    showDialog = true
+                }
         )
     }
 
-    // Add post dialog
+    // Create / Edit Dialog
     if (showDialog) {
         AlertDialog(
             onDismissRequest = { showDialog = false },
             confirmButton = {
                 TextButton(onClick = {
-                    if (userId.isEmpty()) return@TextButton
 
-                    // Save image locally
-                    var localPath: String? = null
+                    var localPath: String? = editingPost?.imageLocalPath
+
                     selectedImageUri?.let { uri ->
-                        val inputStream = context.contentResolver.openInputStream(uri)
                         val file = File(context.filesDir, "${UUID.randomUUID()}.jpg")
-                        inputStream?.use { input -> file.outputStream().use { output -> input.copyTo(output) } }
+                        context.contentResolver.openInputStream(uri)?.use { input ->
+                            file.outputStream().use { output -> input.copyTo(output) }
+                        }
                         localPath = file.absolutePath
                     }
 
-                    val post = Posted(
-                        userId = userId,
-                        description = description,
-                        imageLocalPath = localPath,
-                        userPhotoUrl = userViewModel.uiState.photoUrl,
-                        userName = userViewModel.uiState.username
-                    )
+                    if (editingPost != null) {
+                        val updated = editingPost!!.copy(
+                            description = description,
+                            imageLocalPath = localPath
+                        )
 
-
-                    postRepo.addPost(post) { success, msg ->
-                        if (success) {
-                            posts = posts + post
-                            showSuccess = true
+                        postRepo.updatePost(updated) { success, _ ->
+                            if (success){
+                            posts = posts.map {
+                                if (it.postId == updated.postId) updated else it
+                            }
+                            }
                         }
-                        showDialog = false
-                        selectedImageUri = null
-                        description = ""
+                    } else {
+                        val newPost = Posted(
+                            postId = UUID.randomUUID().toString(),
+                            userId = userId,
+                            description = description,
+                            imageLocalPath = localPath,
+                            userPhotoUrl = userViewModel.uiState.photoUrl,
+                            userName = userViewModel.uiState.username
+                        )
+
+                        postRepo.addPost(newPost) { success, _ ->
+                            if (success) {
+                                posts = posts + newPost
+                            }
+                        }
                     }
+
+                    showDialog = false
+                    editingPost = null
+                    description = ""
+                    selectedImageUri = null
+
                 }) {
-                    Text("Post")
+                    Text(if (editingPost != null) "Update" else "Post")
                 }
             },
             dismissButton = {
-                TextButton(onClick = {
-                    showDialog = false
-                    selectedImageUri = null
-                    description = ""
-                }) {
+                TextButton(onClick = { showDialog = false }) {
                     Text("Cancel")
                 }
             },
@@ -152,20 +178,32 @@ fun HomeScreen(userViewModel: UserViewModel) {
                             .clickable { imagePicker.launch("image/*") },
                         contentAlignment = Alignment.Center
                     ) {
-                        if (selectedImageUri != null) {
-                            val bitmap = context.contentResolver.openInputStream(selectedImageUri!!)?.use { input ->
-                                BitmapFactory.decodeStream(input)
+                        when {
+                            selectedImageUri != null -> {
+                                val bitmap = context.contentResolver
+                                    .openInputStream(selectedImageUri!!)
+                                    ?.use { BitmapFactory.decodeStream(it) }
+                                bitmap?.let {
+                                    Image(
+                                        bitmap = it.asImageBitmap(),
+                                        contentDescription = null,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
                             }
-                            bitmap?.let {
-                                Image(
-                                    bitmap = it.asImageBitmap(),
-                                    contentDescription = null,
-                                    contentScale = ContentScale.Crop,
-                                    modifier = Modifier.fillMaxSize()
-                                )
+                            editingPost?.imageLocalPath != null -> {
+                                val bitmap = BitmapFactory.decodeFile(editingPost!!.imageLocalPath!!)
+                                bitmap?.let {
+                                    Image(
+                                        bitmap = it.asImageBitmap(),
+                                        contentDescription = null,
+                                        modifier = Modifier.fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
                             }
-                        } else {
-                            Text("Click to select image")
+                            else -> Text("Select image")
                         }
                     }
 
@@ -178,72 +216,161 @@ fun HomeScreen(userViewModel: UserViewModel) {
                         modifier = Modifier.fillMaxWidth()
                     )
                 }
-            },
-            shape = RoundedCornerShape(16.dp)
-        )
-    }
-
-    if (showSuccess) {
-        Snackbar(
-            modifier = Modifier.padding(16.dp),
-            action = {
-                TextButton(onClick = { showSuccess = false }) {
-                    Text("OK", color = Color.White)
-                }
             }
-        ) {
-            Text("Post added successfully!", color = Color.White)
-        }
+        )
     }
 }
 
 @Composable
-fun PostCardWithProfile(
-    userViewModel: UserViewModel,
-    uiState: UserUiState,
-    description: String,
-    imagePath: String?
+fun PostCard(
+    post: Posted,
+    isOwner: Boolean,
+    onEdit: (Posted) -> Unit,
+    onDelete: (Posted) -> Unit
 ) {
+    val actionSize = 36.dp
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(Color(0xFFEFEFEF), RoundedCornerShape(8.dp))
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(Color.Black, RoundedCornerShape(12.dp))
+            .padding(16.dp)
     ) {
-        // Circular profile photo
-        Box(
-            contentAlignment = Alignment.BottomEnd,
-            modifier = Modifier.size(80.dp)
-        ) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    model = uiState.photoUrl.ifEmpty { R.drawable.circle_regular_full }
-                ),
-                contentDescription = "Profile Photo",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(CircleShape)
-                    .background(Color.LightGray)
-                    .border(2.dp, Color.Gray, CircleShape)
-            )
+
+        val userViewModel: UserViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+        val userName = userViewModel.uiState.username
+
+        val uiState = userViewModel.uiState
+        val context = LocalContext.current
+
+
+        val imagePicker = rememberLauncherForActivityResult(
+            ActivityResultContracts.GetContent()
+        ) { uri ->
+            uri?.let {
+                val localPath = saveImageToLocalStorage(context, it)
+                userViewModel.setLocalPhoto(localPath)
+                userViewModel.updatePhoto(it)
+            }
         }
 
+        val imageModelWithVersion: Any = when {
+            uiState.localPhotoPath != null && File(uiState.localPhotoPath!!).exists() ->
+                Uri.fromFile(File(uiState.localPhotoPath!!)).toString() + "?v=${uiState.imageVersion}"
+            uiState.photoUri != null ->
+                uiState.photoUri.toString() + "?v=${uiState.imageVersion}"
+            uiState.photoUrl.isNotEmpty() ->
+                uiState.photoUrl + "?v=${uiState.imageVersion}"
+            else -> R.drawable.circle_regular_full
+        }
+
+        if (isOwner) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+
+
+
+                // 🔵 LEFT circle (post owner photo)
+                Box(
+                    contentAlignment = Alignment.BottomEnd,
+                    modifier = Modifier.size(actionSize)
+                ) {
+                    Image(
+                        painter = rememberAsyncImagePainter(imageModelWithVersion),
+                        contentDescription = "Profile Photo",
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .size(140.dp)
+                            .clip(CircleShape)
+                    )
+
+//                    IconButton(
+//                        onClick = { imagePicker.launch("image/*") },
+//                        modifier = Modifier
+//                            .size(40.dp)
+//                            .clip(CircleShape)
+//                            .background(Color.White.copy(alpha = 0.9f))
+//                            .border(1.dp, Color.Gray, CircleShape)
+//                    ) {
+//                        Icon(
+//                            imageVector = Icons.Default.AddAPhoto,
+//                            contentDescription = "Change Photo",
+//                            tint = Color.Black
+//                        )
+//                    }
+
+//                    if (uiState.localPhotoPath != null || uiState.photoUri != null || uiState.photoUrl.isNotEmpty()) {
+//                        IconButton(
+//                            onClick = {
+//                                uiState.localPhotoPath?.let { File(it).delete() }
+//                                userViewModel.uiState = userViewModel.uiState.copy(
+//                                    photoUri = null,
+//                                    localPhotoPath = null,
+//                                    photoUrl = ""
+//                                )
+//                                clearSavedProfileImage(context)
+//                            },
+//                            modifier = Modifier
+//                                .align(Alignment.TopEnd)
+//                                .size(30.dp)
+//                                .clip(CircleShape)
+//                                .background(Color.White)
+//                        ) {
+//                            Icon(
+//                                imageVector = Icons.Default.Delete,
+//                                contentDescription = "Remove Photo",
+//                                tint = Color.Red
+//                            )
+//                        }
+//                    }
+                }
+
+                // ✏️🗑 RIGHT actions
+                Row {
+                    IconButton(
+                        onClick = { onEdit(post) },
+                        modifier = Modifier.size(actionSize)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit",
+                            tint = Color.White
+                        )
+                    }
+
+                    IconButton(
+                        onClick = { onDelete(post) },
+                        modifier = Modifier.size(actionSize)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Delete",
+                            tint = Color.Red
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+        }
+
+        Text(
+            text = post.description,
+            color = Color.White,
+            fontSize = 16.sp
+        )
+
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Description on top
-        Text(text = description, fontSize = 16.sp, color = Color.Black)
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        // Image below description
-        imagePath?.let { path ->
+        post.imageLocalPath?.let { path ->
             val bitmap = BitmapFactory.decodeFile(path)
             bitmap?.let {
                 Image(
                     bitmap = it.asImageBitmap(),
-                    contentDescription = "Post Image",
+                    contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(200.dp)
@@ -254,3 +381,5 @@ fun PostCardWithProfile(
         }
     }
 }
+
+
