@@ -6765,6 +6765,7 @@ fun Greeting() {
                 .clip(shape = CircleShape),
             contentScale = ContentScale.Crop)
     }
+<<<<<<< HEAD
     Spacer(modifier = Modifier .height(10.dp))
 
     Spacer(modifier = Modifier .height(10.dp))
@@ -11146,6 +11147,8 @@ fun Greeting() {
     Spacer(modifier = Modifier .height(10.dp))
 
 
+=======
+>>>>>>> rudish
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -11167,6 +11170,7 @@ fun Greeting() {
 
     Spacer(modifier = Modifier .height(10.dp))
 
+<<<<<<< HEAD
     Text("Enter your username",
         style = TextStyle(
             fontSize = 20.sp
@@ -11198,6 +11202,8 @@ fun Greeting() {
     }
     Spacer(modifier = Modifier .height(10.dp))
 
+=======
+>>>>>>> rudish
     Spacer(modifier = Modifier .height(10.dp))
 
     Text("Enter your username",
@@ -11210,6 +11216,7 @@ fun Greeting() {
     Spacer(modifier = Modifier .height(10.dp))
 
     Spacer(modifier = Modifier .height(10.dp))
+<<<<<<< HEAD
 
 
     Row(
@@ -11229,8 +11236,1862 @@ fun Greeting() {
                 .clip(shape = CircleShape),
             contentScale = ContentScale.Crop)
     }
+=======
+>>>>>>> rudish
 
 
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Text("Enter your username",
+        style = TextStyle(
+            fontSize = 20.sp
+        ),
+        modifier = Modifier
+            .padding(horizontal = 20.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+    Spacer(modifier = Modifier .height(10.dp))
+
+
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .size(105.dp)
+            .clip(CircleShape)
+            .padding(4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    )
+
+    {
+        Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+            modifier = Modifier
+                .size(95.dp)
+                .clip(shape = CircleShape),
+            contentScale = ContentScale.Crop)
+    }
 }
 
 @Preview(showBackground = true)
