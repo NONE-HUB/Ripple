@@ -74,7 +74,7 @@ fun DashboardBody() {
         NavItem("Home", R.drawable.home),
         NavItem("Create", R.drawable.create),
         NavItem("Profile", R.drawable.circle_regular_full),
-        NavItem("Notification", R.drawable.notification)
+        NavItem("Setting", R.drawable.setting)
     )
 
     Scaffold(

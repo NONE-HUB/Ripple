@@ -3,6 +3,7 @@ package com.example.ripple
 import UserModel
 import android.app.DatePickerDialog
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -125,6 +126,12 @@ fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
     var feedbackReportId by remember { mutableStateOf<String?>(null) }  // for feedback dialog
     var feedbackText by remember { mutableStateOf("") }
     val scope = rememberCoroutineScope()
+    var showLogoutDialog by remember { mutableStateOf(false) }
+    var showDeleteDialog by remember { mutableStateOf(false) }
+    var password by remember { mutableStateOf("") }
+
+
+
 
 
     Column(
@@ -266,35 +273,136 @@ fun NotificationScreen(userViewModel: UserViewModel = viewModel()) {
         Spacer(modifier = Modifier.height(24.dp))
 
         // ===== Action Buttons =====
+        // ===== ACTION BUTTONS =====
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+
+            // DELETE ACCOUNT
             Button(
-                onClick = { /* Delete account */ },
+                onClick = { showDeleteDialog = true }, // 👈 open dialog ONLY
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFFF4D4F)),
                 modifier = Modifier
                     .weight(1f)
                     .height(64.dp),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Delete Account", color = Color.White, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                Text("Delete Account", color = Color.White, fontWeight = FontWeight.Bold)
             }
 
+
+
+            // LOGOUT
             Button(
-                onClick = { /* Logout */ },
+                onClick = { showLogoutDialog = true },
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFE0E0E0)),
                 modifier = Modifier
                     .weight(1f)
                     .height(64.dp),
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("Logout", color = Color.Black, fontWeight = androidx.compose.ui.text.font.FontWeight.Bold)
+                Text(
+                    "Logout",
+                    color = Color.Black,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
-
         Spacer(modifier = Modifier.height(32.dp))
+
+        // ===== LOGOUT CONFIRMATION DIALOG =====
+        if (showLogoutDialog) {
+            AlertDialog(
+                onDismissRequest = { showLogoutDialog = false },
+                title = { Text("Logout") },
+                text = { Text("Are you sure you want to log out?") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            showLogoutDialog = false
+                            userViewModel.logout()
+
+                            val intent = Intent(context, LoginActivity::class.java)
+                            intent.flags =
+                                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            context.startActivity(intent)
+                        }
+                    ) {
+                        Text("Yes")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showLogoutDialog = false }
+                    ) {
+                        Text("No")
+                    }
+                }
+            )
+        }
+        if (showDeleteDialog) {
+            AlertDialog(
+                onDismissRequest = { showDeleteDialog = false },
+                title = { Text("Delete Account") },
+                text = {
+                    Column {
+                        Text("Enter your password to confirm deletion")
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedTextField(
+                            value = password,
+                            onValueChange = { password = it },
+                            label = { Text("Password") },
+                            visualTransformation = PasswordVisualTransformation(),
+                            singleLine = true
+                        )
+                    }
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            if (password.isBlank()) {
+                                Toast.makeText(context, "Password required", Toast.LENGTH_SHORT).show()
+                                return@TextButton
+                            }
+
+                            showDeleteDialog = false
+
+                            userViewModel.deleteAccount(
+                                password = password,
+                                onSuccess = {
+                                    val intent = Intent(context, LoginActivity::class.java)
+                                    intent.flags =
+                                        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    context.startActivity(intent)
+                                },
+                                onError = { error ->
+                                    Toast.makeText(context, error, Toast.LENGTH_LONG).show()
+                                }
+                            )
+
+                        }
+                    ) {
+                        Text("Delete")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = {
+                            showDeleteDialog = false
+                            password = ""
+                        }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            )
+        }
+
     }
+
+
+
 
     // ===== User Information Dialog =====
     val userModel = UserModel(
