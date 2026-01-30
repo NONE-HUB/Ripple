@@ -102,7 +102,7 @@ fun ProfileActivity(){
                 .padding(paddingValues = padding)
                 .background(Color.White)
         ){
-            Spacer(modifier = Modifier .height(60.dp))
+            Spacer(modifier = Modifier .height(40.dp))
             Text("English(UK)",
                 style = TextStyle(
                     textAlign = TextAlign.Center,
@@ -113,7 +113,7 @@ fun ProfileActivity(){
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier .height(60.dp))
+            Spacer(modifier = Modifier .height(40.dp))
 
             Row(
                 modifier = Modifier
@@ -132,7 +132,7 @@ fun ProfileActivity(){
             }
 
 
-            Spacer(modifier = Modifier .height(60.dp))
+            Spacer(modifier = Modifier .height(40.dp))
 
 //            OutlinedTextField(
 //                value = email,
