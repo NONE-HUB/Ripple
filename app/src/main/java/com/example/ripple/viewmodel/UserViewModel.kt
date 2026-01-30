@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.ripple.clearSavedProfileImage
 import com.example.ripple.repository.UserRepo
 import com.example.ripple.repository.UserRepoImpl
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.launch
 import com.google.firebase.storage.FirebaseStorage
@@ -52,6 +53,8 @@ class UserViewModel(private val repo: UserRepo = UserRepoImpl()) : ViewModel() {
     init {
         loadUser()
     }
+
+
 
 
 
@@ -106,20 +109,72 @@ class UserViewModel(private val repo: UserRepo = UserRepoImpl()) : ViewModel() {
         }
     }
 
-    /** Delete current user account */
-    fun deleteAccount(onComplete: (Boolean, String) -> Unit) {
-        if (userId.isEmpty()) {
-            onComplete(false, "User not logged in")
+    fun logout() {
+        // clear SharedPreferences / token / session
+    }
+
+    fun deleteAccount(
+        password: String,
+        onSuccess: () -> Unit,
+        onError: (String) -> Unit
+    ) {
+        val auth = FirebaseAuth.getInstance()
+        val user = auth.currentUser
+
+        if (user == null) {
+            onError("No authenticated user")
             return
         }
 
-        viewModelScope.launch {
-            // Make sure your UserRepo has a method deleteAccount(userId, callback)
-            repo.deleteAccount(userId) { success: Boolean, message: String ->
-                onComplete(success, message)
-            }
+        val email = user.email
+        if (email.isNullOrBlank()) {
+            onError("This account cannot be deleted using password authentication")
+            return
         }
+
+        if (password.isBlank()) {
+            onError("Password cannot be empty")
+            return
+        }
+
+        val credential = EmailAuthProvider.getCredential(email, password)
+
+        user.reauthenticate(credential)
+            .addOnSuccessListener {
+                user.delete()
+                    .addOnSuccessListener { onSuccess() }
+                    .addOnFailureListener {
+                        onError(it.message ?: "Delete failed")
+                    }
+            }
+            .addOnFailureListener { e ->
+                onError(e.message ?: "Re-authentication failed")
+            }
     }
+
+
+    fun clearProfilePhoto() {
+        uiState = uiState.copy(
+            photoUri = null,
+            localPhotoPath = null,
+            photoUrl = ""
+        )
+    }
+
+    /** Delete current user account */
+//    fun deleteAccount(onComplete: (Boolean, String) -> Unit) {
+//        if (userId.isEmpty()) {
+//            onComplete(false, "User not logged in")
+//            return
+//        }
+//
+//        viewModelScope.launch {
+//            // Make sure your UserRepo has a method deleteAccount(userId, callback)
+//            repo.deleteAccount(userId) { success: Boolean, message: String ->
+//                onComplete(success, message)
+//            }
+//        }
+//    }
 
     /** Update user photo in UI state (should also update Firestore / Storage) */
     /** Update user photo in UI state (should also update Firestore / Storage) */

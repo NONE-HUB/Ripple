@@ -102,7 +102,7 @@ fun ProfileActivity(){
                 .padding(paddingValues = padding)
                 .background(Color.White)
         ){
-            Spacer(modifier = Modifier .height(60.dp))
+            Spacer(modifier = Modifier .height(40.dp))
             Text("English(UK)",
                 style = TextStyle(
                     textAlign = TextAlign.Center,
@@ -113,25 +113,26 @@ fun ProfileActivity(){
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier .height(60.dp))
+            Spacer(modifier = Modifier .height(40.dp))
 
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .size(105.dp)
-                    .clip(CircleShape)
-                    .padding(4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Image(painter = painterResource(R.drawable.instagram), contentDescription = null,
+                Image(
+                    painter = painterResource(R.drawable.ripple_icon),
+                    contentDescription = null,
                     modifier = Modifier
-                        .size(95.dp)
-                        .clip(shape = CircleShape),
-                    contentScale = ContentScale.Crop)
+                        .size(150.dp)
+                        .clip(CircleShape),
+                    contentScale = ContentScale.Fit
+                )
             }
 
-            Spacer(modifier = Modifier .height(60.dp))
+
+            Spacer(modifier = Modifier .height(40.dp))
 
 //            OutlinedTextField(
 //                value = email,
